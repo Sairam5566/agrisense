@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Agriculture Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-green: #28a745;
+            --secondary-green: #20c997;
+            --light-green: #d4edda;
+            --dark-green: #155724;
+            --wheat-gold: #ffb700;
+            --earth-brown: #8b4513;
+            --light-brown: #deb887;
+            --text-dark: #333;
+            --text-light: #f8f9fa;
+            --border-light: #e9ecef;
+            --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+            --shadow-xl: 0 2rem 4rem rgba(0, 0, 0, 0.2);
+            --danger-red: #dc3545;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Navigation */
+        .navbar {
+            box-shadow: var(--shadow-md);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--wheat-gold) !important;
+        }
+
+        /* Feature Card */
+        .card {
+            border-radius: 15px;
+            box-shadow: var(--shadow-lg);
+            border: none;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            border-radius: 15px 15px 0 0 !important;
+            font-weight: 600;
+        }
+
+        /* Agriculture Buttons */
+        .btn-agriculture {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-agriculture:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--earth-brown), var(--light-brown));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: white;
+        }
+
+        /* Language Selector */
+        .language-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-light);
+            color: var(--text-light);
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .language-btn:hover, .language-btn.active {
+            background: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, var(--earth-brown), #5d2906);
+        }
+
+        footer a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        footer a:hover {
+            color: var(--wheat-gold);
+        }
+
+        /* Agriculture Icons with Animation */
+        .agri-icon-wheat::before { content: "🌾"; }
+        .agri-icon-tractor::before { content: "🚜"; }
+        .agri-icon-plant::before { content: "🌱"; }
+        .agri-icon-sun::before { content: "☀️"; }
+        .agri-icon-rain::before { content: "🌧️"; }
+        .agri-icon-farmer::before { content: "👨‍🌾"; }
+
+        .agri-icon-wheat, .agri-icon-tractor, .agri-icon-plant, 
+        .agri-icon-sun, .agri-icon-rain, .agri-icon-farmer {
+            display: inline-block;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.25rem;
+            }
+            
+            .card {
+                margin: 15px 0;
+            }
+        }
+
+        /* Reduced Motion Support */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'partials/header.html' %}
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h2><i class="fas fa-envelope"></i> Contact Us</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-4">Have questions or feedback? Reach out to us through any of these channels:</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="contact-card p-3 border rounded">
+                                    <h5><i class="fas fa-phone text-success"></i> Phone</h5>
+                                    <p class="mb-1">Farmer Helpline: 1800-XXX-XXXX</p>
+                                    <p class="text-muted small">Available 24/7</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="contact-card p-3 border rounded">
+                                    <h5><i class="fas fa-envelope text-success"></i> Email</h5>
+                                    <p class="mb-1">support@agricultureportal.com</p>
+                                    <p class="text-muted small">We respond within 24 hours</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="contact-card p-3 border rounded">
+                                    <h5><i class="fas fa-map-marker-alt text-success"></i> Office</h5>
+                                    <p class="mb-1">Agriculture Portal Headquarters</p>
+                                    <p class="mb-1">123 Farm Tech Avenue</p>
+                                    <p class="mb-0">New Delhi, India</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="contact-card p-3 border rounded">
+                                    <h5><i class="fas fa-comments text-success"></i> Live Chat</h5>
+                                    <p class="mb-1">Chat with our agricultural experts</p>
+                                    <button class="btn btn-agriculture mt-2" onclick="openChat()">Start Chat</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <h4 class="mb-4">Send us a Message</h4>
+                        <form id="contactForm">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Phone (Optional)</label>
+                                <input type="tel" class="form-control" id="phone">
+                            </div>
+                            <div class="mb-3">
+                                <label for="message" class="form-label">Message</label>
+                                <textarea class="form-control" id="message" rows="5" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-agriculture">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <p>&copy; 2025 Agriculture Portal. All rights reserved.</p>
+                    <p class="text-muted">Agricultural advice is for guidance only. Consult local experts for specific recommendations.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+            
+            // In a real application, you would send this data to your server
+            alert(`Thank you, ${name}! Your message has been sent. We'll get back to you at ${email} soon.`);
+            
+            // Reset form
+            this.reset();
+        });
+        
+        function openChat() {
+            alert('Live chat feature - Add your chat implementation here');
+        }
+    </script>
+<script src="/template/translate.js"></script>
+</body>
+</html>

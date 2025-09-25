@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Market Prices - Real-time Commodity Data</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-btn:hover {
+            background-color: #f8f9fa;
+            border-bottom-color: #28a745;
+        }
+
+        .nav-btn.active {
+            border-bottom-color: #28a745;
+            background-color: #f8f9fa;
+        }
+
+        .nav-btn i {
+            margin-right: 8px;
+        }
+
+        /* Main content */
+        main {
+            padding: 2rem 0;
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-header h2 {
+            color: #28a745;
+        }
+
+        /* Buttons */
+        .btn-primary, .btn-success, .btn-secondary {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        /* Filters */
+        .filters {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .filters select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            min-width: 200px;
+            margin-right: 1rem;
+        }
+
+        /* Prices Grid */
+        .prices-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .price-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .price-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .price-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .price-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .price-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .price-badge.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .price-badge.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .price-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .price-item {
+            text-align: center;
+        }
+
+        .price-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .price-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .price-location {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Trend Controls */
+        .trend-controls {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .trend-controls select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        /* Search Form */
+        .search-form {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        /* Results Table */
+        .results-table {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+
+        .results-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .results-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #28a745;
+        }
+
+        .results-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Alerts */
+        .alerts-info {
+            background: #e7f5e7;
+            border: 1px solid #d4edda;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            color: #155724;
+        }
+
+        .alerts-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .alert-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .alert-info {
+            flex-grow: 1;
+        }
+
+        .alert-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 0;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #28a745;
+        }
+
+        .modal-close {
+            font-size: 2rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #28a745;
+        }
+
+        /* Footer */
+        footer {
+            background: #343a40;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-links {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .footer-links a {
+            color: #28a745;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* Error and No Data */
+        .error, .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .error {
+            color: #dc3545;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .nav-btn {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .prices-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .trend-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .results-table {
+                overflow-x: auto;
+            }
+
+            .alert-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .filters select {
+                margin-right: 0;
+                margin-bottom: 1rem;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-seedling"></i> Farmer Market Prices</h1>
+            <p class="subtitle">Real-time commodity prices to help farmers make informed decisions</p>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <button class="nav-btn active" onclick="showSection('prices')">
+                <i class="fas fa-chart-line"></i> Current Prices
+            </button>
+            <button class="nav-btn" onclick="showSection('trends')">
+                <i class="fas fa-chart-bar"></i> Price Trends
+            </button>
+            <button class="nav-btn" onclick="showSection('search')">
+                <i class="fas fa-search"></i> Advanced Search
+            </button>
+            <button class="nav-btn" onclick="showSection('alerts')">
+                <i class="fas fa-bell"></i> Price Alerts
+            </button>
+        </div>
+    </nav>
+
+    <main class="container">
+
+        <!-- Current Prices Section -->
+        <section id="prices" class="section active">
+            <div class="section-header">
+                <h2>Current Market Prices</h2>
+                <button class="btn-primary" onclick="loadPrices()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+
+            <div class="filters">
+                <select id="state-filter" onchange="filterByState()">
+                    <option value="">All States</option>
+                    <!-- Options will be populated dynamically -->
+                </select>
+                <select id="commodity-filter" onchange="filterByCommodity()">
+                    <option value="">All Commodities</option>
+                    <option value="Tomato">Tomato</option>
+                    <option value="Potato">Potato</option>
+                    <option value="Onion">Onion</option>
+                    <option value="Rice">Rice</option>
+                    <option value="Wheat">Wheat</option>
+                    <option value="Banana">Banana</option>
+                    <option value="Apple">Apple</option>
+                    <option value="Orange">Orange</option>
+                </select>
+            </div>
+
+            <div id="prices-loading" class="loading">
+                <i class="fas fa-spinner fa-spin"></i> Loading prices...
+            </div>
+
+            <div id="prices-container" class="prices-grid">
+                <!-- Prices will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Trends Section -->
+        <section id="trends" class="section">
+            <div class="section-header">
+                <h2>Price Trends & Analysis</h2>
+            </div>
+
+            <div class="trend-controls">
+                <select id="trend-commodity">
+                    <option value="Tomato">Tomato</option>
+                    <option value="Potato">Potato</option>
+                    <option value="Onion">Onion</option>
+                </select>
+                <select id="trend-market">
+                    <option value="Koyambedu">Koyambedu</option>
+                    <option value="Azadpur">Azadpur</option>
+                    <option value="Lasalgaon">Lasalgaon</option>
+                </select>
+                <select id="trend-days">
+                    <option value="7">7 Days</option>
+                    <option value="14">14 Days</option>
+                    <option value="30">30 Days</option>
+                </select>
+                <button class="btn-primary" onclick="loadTrends()">
+                    <i class="fas fa-chart-line"></i> Analyze
+                </button>
+            </div>
+
+            <div id="trends-container">
+                <!-- Trends will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Search Section -->
+        <section id="search" class="section">
+            <div class="section-header">
+                <h2>Advanced Price Search</h2>
+            </div>
+
+            <div class="search-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Commodity</label>
+                        <input type="text" id="search-commodity" placeholder="e.g., Tomato, Potato" list="commodities-list">
+                        <datalist id="commodities-list">
+                            <option value="Tomato">
+                            <option value="Potato">
+                            <option value="Onion">
+                            <option value="Rice">
+                            <option value="Wheat">
+                            <option value="Banana">
+                            <option value="Apple">
+                        </datalist>
+                    </div>
+                    <div class="form-group">
+                        <label>State</label>
+                        <select id="search-state">
+                            <option value="">All States</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Gujarat">Gujarat</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="search-date">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn-primary" onclick="performSearch()">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <button class="btn-secondary" onclick="clearSearch()">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                </div>
+            </div>
+
+            <div id="search-results">
+                <!-- Search results will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Alerts Section -->
+        <section id="alerts" class="section">
+            <div class="section-header">
+                <h2>Price Alerts</h2>
+                <button class="btn-success" onclick="showAlertModal()">
+                    <i class="fas fa-plus"></i> Create Alert
+                </button>
+            </div>
+
+            <div class="alerts-info">
+                <p><i class="fas fa-info-circle"></i> Get notified when commodity prices reach your target levels to make timely selling decisions.</p>
+            </div>
+
+            <div id="alerts-container">
+                <!-- Alerts will be loaded here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Alert Modal -->
+    <div id="alert-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Price Alert</h3>
+                <span class="modal-close" onclick="closeAlertModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="alert-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Farmer ID (Optional)</label>
+                            <input type="text" id="alert-farmer-id" placeholder="Auto-generated if empty">
+                        </div>
+                        <div class="form-group">
+                            <label>Commodity</label>
+                            <select id="alert-commodity" required>
+                                <option value="">Select Commodity</option>
+                                <option value="Tomato">Tomato</option>
+                                <option value="Potato">Potato</option>
+                                <option value="Onion">Onion</option>
+                                <option value="Rice">Rice</option>
+                                <option value="Wheat">Wheat</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Target Price (₹/kg)</label>
+                            <input type="number" id="alert-price" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Alert Type</label>
+                            <select id="alert-type">
+                                <option value="below">Alert when price goes below target</option>
+                                <option value="above">Alert when price goes above target</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeAlertModal()">Cancel</button>
+                        <button type="submit" class="btn-success">Create Alert</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Market Price Web Scraping System for Farmers</p>
+            <p class="footer-links">
+                <a href="http://localhost:9000/docs" target="_blank">API Documentation</a> |
+                <a href="http://localhost:9000/redoc" target="_blank">ReDoc</a> |
+                Data sourced from eNAM, Agmarknet, and VegetableMarketPrice.com
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // API Configuration
+        const API_BASE_URL = '';
+
+        // Global variables
+        let currentSection = 'prices';
+        let allPrices = [];
+        let selectedState = '';
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSupportedStates();
+            setupFormHandlers();
+            loadPrices();
+        });
+
+        // Navigation
+        function showSection(sectionName) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionName).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            currentSection = sectionName;
+
+            switch(sectionName) {
+                case 'prices':
+                    loadPrices();
+                    break;
+                case 'alerts':
+                    loadAlerts();
+                    break;
+            }
+        }
+
+        // API Helper Functions
+        async function apiCall(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('API call failed:', error);
+                throw error;
+            }
+        }
+
+        // Prices Section
+        async function loadPrices() {
+            const container = document.getElementById('prices-container');
+            const loading = document.getElementById('prices-loading');
+
+            loading.style.display = 'block';
+            container.innerHTML = '';
+
+            try {
+                let endpoint = '/prices/today';
+                if (selectedState) {
+                    endpoint += `?state=${encodeURIComponent(selectedState)}`;
+                }
+                const prices = await apiCall(endpoint);
+                allPrices = prices;
+                displayPrices(prices);
+            } catch (error) {
+                console.error('Failed to load prices:', error);
+                container.innerHTML = '<div class="error">Failed to load prices. Please make sure the backend is running.</div>';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        async function filterByCommodity() {
+            const selectedCommodity = document.getElementById('commodity-filter').value;
+            const container = document.getElementById('prices-container');
+            const loading = document.getElementById('prices-loading');
+
+            loading.style.display = 'block';
+            container.innerHTML = '';
+
+            try {
+                let prices;
+                if (!selectedCommodity) {
+                    let endpoint = '/prices/today';
+                    if (selectedState) {
+                        endpoint += `?state=${encodeURIComponent(selectedState)}`;
+                    }
+                    prices = await apiCall(endpoint);
+                } else {
+                    let endpoint = `/prices/today/${selectedCommodity}`;
+                    if (selectedState) {
+                        endpoint += `?state=${encodeURIComponent(selectedState)}`;
+                    }
+                    prices = await apiCall(endpoint);
+                }
+                allPrices = prices;
+                displayPrices(prices);
+            } catch (error) {
+                console.error('Failed to filter prices:', error);
+                container.innerHTML = '<div class="error">Failed to load prices. Please try again.</div>';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        async function filterByState() {
+            selectedState = document.getElementById('state-filter').value;
+            await loadPrices();
+            document.getElementById('commodity-filter').value = '';
+        }
+
+        function displayPrices(prices) {
+            const container = document.getElementById('prices-container');
+            container.innerHTML = '';
+
+            if (prices.length === 0) {
+                container.innerHTML = '<div class="no-data">No price data available</div>';
+                return;
+            }
+
+            prices.forEach(price => {
+                const priceCard = createPriceCard(price);
+                container.appendChild(priceCard);
+            });
+        }
+
+        function createPriceCard(price) {
+            const card = document.createElement('div');
+            card.className = 'price-card';
+
+            const trendPercent = price.trend_percent || 0;
+            const trendClass = trendPercent >= 0 ? 'positive' : 'negative';
+            const trendIcon = trendPercent >= 0 ? '↗️' : '↘️';
+
+            card.innerHTML = `
+                <div class="price-header">
+                    <div class="price-title">${price.commodity}</div>
+                    <div class="price-badge ${trendClass}">${trendIcon} ${Math.abs(trendPercent).toFixed(1)}%</div>
+                </div>
+                <div class="price-details">
+                    <div class="price-item">
+                        <div class="price-value">₹${price.price}</div>
+                        <div class="price-label">Current Price</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-value">₹${price.min_price} - ₹${price.max_price}</div>
+                        <div class="price-label">Min - Max</div>
+                    </div>
+                </div>
+                <div class="price-location">
+                    <i class="fas fa-map-marker-alt"></i> ${price.market_name}, ${price.city}, ${price.state}
+                </div>
+                <div class="price-date">
+                    <i class="fas fa-clock"></i> Updated: ${new Date(price.date).toLocaleDateString()}
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Trends Section
+        async function loadTrends() {
+            const container = document.getElementById('trends-container');
+            const commodity = document.getElementById('trend-commodity').value;
+            const market = document.getElementById('trend-market').value;
+            const days = document.getElementById('trend-days').value;
+
+            container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Analyzing trends...</div>';
+
+            try {
+                const historicalData = await apiCall(`/prices/history/${commodity}/${days}`);
+                let trendPercent = 0;
+                let trendDirection = 'stable';
+                let currentPrice = 'N/A';
+                let previousPrice = 'N/A';
+
+                if (historicalData.length >= 2) {
+                    const latest = historicalData[0].avg_price;
+                    const previous = historicalData[1].avg_price;
+                    trendPercent = ((latest - previous) / previous) * 100;
+                    trendDirection = trendPercent > 0 ? 'up' : trendPercent < 0 ? 'down' : 'stable';
+                    currentPrice = latest.toFixed(2);
+                    previousPrice = previous.toFixed(2);
+                } else if (historicalData.length === 1) {
+                    currentPrice = historicalData[0].avg_price.toFixed(2);
+                }
+
+                const trendData = {
+                    commodity: commodity,
+                    market: market,
+                    trend_percent: trendPercent,
+                    trend_direction: trendDirection,
+                    current_price: currentPrice,
+                    previous_price: previousPrice,
+                    historical_data: historicalData
+                };
+
+                displayTrendAnalysis(trendData);
+            } catch (error) {
+                console.error('Failed to load trend analysis:', error);
+                container.innerHTML = '<div class="error">Failed to load trend analysis. Please make sure the backend is running.</div>';
+            }
+        }
+
+        function displayTrendAnalysis(trend) {
+            const container = document.getElementById('trends-container');
+            const trendCard = document.createElement('div');
+            trendCard.className = 'trend-card';
+
+            const trendIcon = trend.trend_direction === 'up' ? '📈' : trend.trend_direction === 'down' ? '📉' : '➡️';
+            const trendColor = trend.trend_percent > 0 ? '#28a745' : trend.trend_percent < 0 ? '#dc3545' : '#6c757d';
+
+            trendCard.innerHTML = `
+                <div class="trend-header">
+                    <div class="trend-title">${trendIcon} ${trend.commodity} - ${trend.market}</div>
+                    <div style="color: ${trendColor}; font-weight: bold; font-size: 1.2rem;">
+                        ${trend.trend_percent > 0 ? '+' : ''}${trend.trend_percent.toFixed(1)}%
+                    </div>
+                </div>
+                <div class="trend-metric">
+                    <div class="metric-item">
+                        <div class="metric-value">${trend.current_price}</div>
+                        <div class="metric-label">Current Price</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">${trend.previous_price}</div>
+                        <div class="metric-label">Previous Price</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value" style="color: ${trendColor}">
+                            ${trend.trend_percent > 0 ? '+' : ''}${trend.trend_percent.toFixed(1)}%
+                        </div>
+                        <div class="metric-label">Change</div>
+                    </div>
+                </div>
+                <div class="trend-insights">
+                    <h5>💡 Insights</h5>
+                    <p>
+                        ${trend.historical_data.length > 0
+                            ? `Historical data available for ${trend.historical_data.length} days.`
+                            : 'No historical data available for trend analysis.'
+                        }
+                    </p>
+                </div>
+            `;
+
+            container.innerHTML = '';
+            container.appendChild(trendCard);
+        }
+
+        // Load supported states
+        async function loadSupportedStates() {
+            try {
+                const states = await apiCall('/states');
+                const stateFilter = document.getElementById('state-filter');
+                stateFilter.innerHTML = '<option value="">All States</option>';
+                states.forEach(state => {
+                    const option = document.createElement('option');
+                    option.value = state;
+                    option.textContent = state;
+                    stateFilter.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Failed to load supported states:', error);
+            }
+        }
+
+        // Search Section
+        async function performSearch() {
+            const commodity = document.getElementById('search-commodity').value;
+            const state = document.getElementById('search-state').value;
+            const date = document.getElementById('search-date').value;
+            const resultsContainer = document.getElementById('search-results');
+
+            if (!commodity && !state && !date) {
+                alert('Please enter at least one search criteria');
+                return;
+            }
+
+            resultsContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+
+            try {
+                let searchUrl = `${API_BASE_URL}/prices/search?`;
+                if (commodity) {
+                    searchUrl += `commodity=${encodeURIComponent(commodity)}&`;
+                }
+                if (state) {
+                    searchUrl += `state=${encodeURIComponent(state)}&`;
+                }
+                searchUrl = searchUrl.slice(0, -1);
+
+                const response = await fetch(searchUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const searchResults = await response.json();
+                displaySearchResults(searchResults);
+            } catch (error) {
+                console.error('Search failed:', error);
+                resultsContainer.innerHTML = '<div class="error">Search failed. Please make sure the backend is running.</div>';
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('search-commodity').value = '';
+            document.getElementById('search-state').value = '';
+            document.getElementById('search-date').value = '';
+            document.getElementById('search-results').innerHTML = '';
+        }
+
+        function displaySearchResults(results) {
+            const container = document.getElementById('search-results');
+
+            if (results.length === 0) {
+                container.innerHTML = '<div class="no-data">No results found matching your criteria</div>';
+                return;
+            }
+
+            const tableHTML = `
+                <div class="results-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Commodity</th>
+                                <th>Market</th>
+                                <th>Location</th>
+                                <th>Price (₹/kg)</th>
+                                <th>Min-Max</th>
+                                <th>State</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${results.map(result => `
+                                <tr>
+                                    <td><strong>${result.commodity}</strong></td>
+                                    <td>${result.market_name}</td>
+                                    <td>${result.city}</td>
+                                    <td><strong style="color: #28a745;">₹${result.price}</strong></td>
+                                    <td>₹${result.min_price || 'N/A'} - ₹${result.max_price || 'N/A'}</td>
+                                    <td><span class="state-badge">${result.state}</span></td>
+                                    <td>${new Date(result.date).toLocaleDateString()}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            container.innerHTML = tableHTML;
+        }
+
+        // Alerts Section
+        async function loadAlerts() {
+            const container = document.getElementById('alerts-container');
+            container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading alerts...</div>';
+
+            try {
+                const alerts = await apiCall('/alerts');
+                if (alerts.length === 0) {
+                    container.innerHTML = '<div class="no-data">No price alerts set up yet</div>';
+                    return;
+                }
+
+                const alertsHTML = alerts.map(alert => `
+                    <div class="alert-card">
+                        <div class="alert-info">
+                            <div class="alert-header">
+                                <strong>${alert.commodity}</strong>
+                                <span class="alert-farmer">Farmer: ${alert.farmer_id}</span>
+                            </div>
+                            <div class="alert-details">
+                                Target: ₹${alert.target_price} |
+                                Alert when price goes ${alert.alert_type} |
+                                Created: ${new Date(alert.created_at).toLocaleDateString()}
+                            </div>
+                            <div class="alert-status">
+                                <span class="status-badge ${alert.status}">${alert.status}</span>
+                            </div>
+                        </div>
+                        <div class="alert-actions">
+                            <button class="btn-secondary" onclick="deleteAlert(${alert.id})">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+                container.innerHTML = alertsHTML;
+            } catch (error) {
+                console.error('Failed to load alerts:', error);
+                container.innerHTML = '<div class="error">Failed to load alerts. Please make sure the backend is running.</div>';
+            }
+        }
+
+        async function createAlert() {
+            const farmerId = document.getElementById('alert-farmer-id').value || null;
+            const commodity = document.getElementById('alert-commodity').value;
+            const targetPrice = parseFloat(document.getElementById('alert-price').value);
+            const alertType = document.getElementById('alert-type').value;
+
+            if (!commodity || isNaN(targetPrice)) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            try {
+                const response = await apiCall('/alerts', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        farmer_id: farmerId,
+                        commodity: commodity,
+                        target_price: targetPrice,
+                        alert_type: alertType
+                    })
+                });
+
+                closeAlertModal();
+                loadAlerts();
+                alert('Price alert created successfully!');
+            } catch (error) {
+                console.error('Failed to create alert:', error);
+                alert('Failed to create alert. Please make sure the backend is running.');
+            }
+        }
+
+        async function deleteAlert(alertId) {
+            if (confirm('Are you sure you want to delete this alert?')) {
+                try {
+                    await apiCall(`/alerts/${alertId}`, {
+                        method: 'DELETE'
+                    });
+                    loadAlerts();
+                    alert('Alert deleted successfully!');
+                } catch (error) {
+                    console.error('Failed to delete alert:', error);
+                    alert('Failed to delete alert. Please make sure the backend is running.');
+                }
+            }
+        }
+
+        function showAlertModal() {
+            document.getElementById('alert-modal').style.display = 'block';
+        }
+
+        function closeAlertModal() {
+            document.getElementById('alert-modal').style.display = 'none';
+            document.getElementById('alert-form').reset();
+        }
+
+        // Form Handlers
+        function setupFormHandlers() {
+            document.getElementById('alert-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                createAlert();
+            });
+
+            window.onclick = function(event) {
+                const modal = document.getElementById('alert-modal');
+                if (event.target === modal) {
+                    closeAlertModal();
+                }
+            };
+        }
+
+        // Error handling
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection:', event.reason);
+        });
+    </script>
+</body>
+</html>

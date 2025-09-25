@@ -1,0 +1,160 @@
+<!-- Restored Shared Header: templates/partials/header.html -->
+<style>
+  :root { --primary-green:#1a5f1a; --secondary-green:#2d8f47; --text-light:#fff; }
+  .app-navbar { background: linear-gradient(135deg, var(--primary-green), var(--secondary-green)); box-shadow: 0 6px 16px rgba(0,0,0,.15); padding: 12px 0; margin-bottom: 0; }
+  .app-navbar .navbar-brand { color: var(--text-light); font-weight:700; text-decoration:none; display:flex; align-items:center; gap:10px; }
+  .app-navbar .nav-link { color: var(--text-light); font-weight:500; margin: 0 6px; }
+  .app-navbar .nav-link:hover { opacity:.9; }
+  .app-navbar .lang-select { min-width: 160px; border-radius: 999px; padding: .25rem .75rem; }
+</style>
+<nav class="app-navbar navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <i class="fas fa-seedling"></i>
+      <span data-translate="site_title">Agriculture Portal</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-center">
+        <li class="nav-item d-flex align-items-center me-2">
+          <i class="fas fa-globe text-white me-2"></i>
+          <select id="langSelectPartial" class="form-select form-select-sm lang-select">
+            <option value="en">English</option>
+            <option value="hi">हिंदी</option>
+            <option value="nagpuri">नागपुरी</option>
+            <option value="santali">संताली</option>
+          </select>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="/home"><i class="fas fa-home"></i> <span data-translate="home">Home</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="/weather"><i class="fas fa-cloud-sun"></i> <span data-translate="weather">Weather</span></a></li>
+        <li class="nav-item d-none" id="navFarmer"><a class="nav-link" href="/farmer"><i class="fas fa-tractor"></i> <span data-translate="farmer_portal">Farmer Portal</span></a></li>
+        <li class="nav-item d-none" id="navBuyer"><a class="nav-link" href="/buyer"><i class="fas fa-store"></i> <span data-translate="buyer_portal">Buyer Portal</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="/contact"><i class="fas fa-envelope"></i> <span data-translate="contact">Contact</span></a></li>
+        <li class="nav-item d-none" id="navLogout"><a class="nav-link" href="#" onclick="appLogout()"><i class="fas fa-right-from-bracket"></i> <span data-translate="logout">Logout</span></a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<script>
+  // Initialize language select for partial header
+  (function(){
+    try{
+      var sel = document.getElementById('langSelectPartial');
+      if (!sel) return;
+      var saved = localStorage.getItem('preferred_language') || 'en';
+      if ([...sel.options].some(o => o.value === saved)) sel.value = saved;
+      sel.addEventListener('change', function(e){
+        if (typeof window.changeLanguage === 'function') { window.changeLanguage(e.target.value); }
+        // Ensure body content also updates immediately if translate.js is present
+        if (typeof window.translateDynamicContent === 'function') { window.translateDynamicContent(e.target.value); }
+        else { try { localStorage.setItem('preferred_language', e.target.value); } catch(_){} }
+      });
+    }catch(err){ console.warn(err); }
+  })();
+  // Toggle header items by login state
+  (function(){
+    var ut = localStorage.getItem('user_type');
+    var token = localStorage.getItem('token');
+    var farmer = document.getElementById('navFarmer');
+    var buyer = document.getElementById('navBuyer');
+    var logout = document.getElementById('navLogout');
+    if(token){
+      if(ut === 'farmer' && farmer) farmer.classList.remove('d-none');
+      if(ut === 'customer' && buyer) buyer.classList.remove('d-none');
+      if(logout) logout.classList.remove('d-none');
+    }
+  })();
+  function appLogout(){ localStorage.removeItem('token'); localStorage.removeItem('user_type'); localStorage.removeItem('user_id'); window.location.href='/'; }
+  // Smart navigation: from base -> section keeps base in history; section -> section replaces history
+  (function(){
+    function isSection(path){
+      return ['/weather','/farmer','/buyer','/contact','/market','/soil-analysis','/news','/chatbot','/speech-to-text','/text-to-speech','/home','/schemes'].includes(path);
+    }
+    try{
+      document.querySelectorAll('.app-navbar .nav-link[href^="/"]').forEach(function(a){
+        a.addEventListener('click', function(e){
+          if (e.ctrlKey || e.metaKey || a.target === '_blank') return; // allow new tab
+          const href = a.getAttribute('href');
+          if (!href || !href.startsWith('/')) return;
+          e.preventDefault();
+          const current = location.pathname;
+          const fromBase = (current === '/' || current === '/home');
+          const toSection = isSection(href);
+          if (!toSection){
+            window.location.href = href; // normal
+          } else if (fromBase){
+            window.location.href = href; // keep base in history
+          } else {
+            window.location.replace(href); // moving between sections => no extra history
+          }
+        });
+      });
+    }catch(err){ console.warn(err); }
+  })();
+  // Fallback translations for pages that don't define changeLanguage (non-base pages)
+  (function(){
+    try{
+      if (typeof window.changeLanguage !== 'function'){
+        var headerTranslations = {
+          en: {
+            site_title: "Agriculture Portal",
+            home: "Home",
+            contact: "Contact",
+            weather: "Weather",
+            disease_prediction: "Disease Prediction",
+            farmer_portal: "Farmer Portal",
+            buyer_portal: "Buyer Portal",
+            logout: "Logout"
+          },
+          hi: {
+            site_title: "कृषि पोर्टल",
+            home: "होम",
+            contact: "संपर्क",
+            weather: "मौसम",
+            disease_prediction: "बीमारी पूर्वानुमान",
+            farmer_portal: "किसान पोर्टल",
+            buyer_portal: "खरीदार पोर्टल",
+            logout: "लॉगआउट"
+          },
+          nagpuri: {
+            site_title: "खेती पोर्टल",
+            home: "घर",
+            contact: "संपर्क",
+            weather: "मौसम",
+            disease_prediction: "बीमारी देखाइ",
+            farmer_portal: "किसान पोर्टल",
+            buyer_portal: "खरीदार पोर्टल",
+            logout: "लॉगआउट"
+          },
+          santali: {
+            site_title: "हल पोर्टल",
+            home: "ओड़ाक्",
+            contact: "जोगाजोग",
+            weather: "मौसम",
+            disease_prediction: "रोग ओड़ाय",
+            farmer_portal: "हल कोरा पोर्टल",
+            buyer_portal: "क्रेता पोर्टल",
+            logout: "लॉगआउट"
+          }
+        };
+        window.changeLanguage = function(lang){
+          try{ localStorage.setItem('preferred_language', lang); }catch(_){ }
+          var dict = headerTranslations[lang] || headerTranslations.en;
+          document.querySelectorAll('[data-translate]').forEach(function(el){
+            var key = el.getAttribute('data-translate');
+            if (key && dict[key]) { el.textContent = dict[key]; }
+          });
+        };
+        document.addEventListener('DOMContentLoaded', function(){
+          var saved = 'en';
+          try{ saved = localStorage.getItem('preferred_language') || 'en'; }catch(_){ }
+          var sel = document.getElementById('langSelectPartial');
+          if (sel && [...sel.options].some(function(o){ return o.value === saved; })) sel.value = saved;
+          window.changeLanguage(saved);
+        });
+      }
+    }catch(err){ console.warn(err); }
+  })();
+</script>

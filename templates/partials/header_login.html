@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agriculture Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root{
+      --earth-brown:#7c4a24; --wheat:#f5e6c8; --leaf:#2d8f47; --dark:#1f2937; --soft:#faf7f2; --accent:#0084ff;
+      --light-green:#8fd8a0; --primary-green:#2d8f47; --wheat-gold:#f5e6c8; --border-light:#e0e7ff;
+      --shadow-sm:0 2px 8px rgba(0,0,0,.08); --shadow-md:0 4px 16px rgba(0,0,0,.12); --shadow-lg:0 8px 24px rgba(0,0,0,.15);
+    }
+    .app-navbar{
+      background:linear-gradient(135deg, var(--soft), #eef7ff);
+      box-shadow:var(--shadow-md);
+      padding:16px 0;
+      border-bottom:1px solid var(--border-light);
+    }
+    .navbar-brand{
+      font-weight:800;
+      color:var(--primary-green);
+      font-size:1.8rem;
+    }
+    .language-selector{
+      position:absolute;
+      top:16px;
+      right:16px;
+      z-index:1000;
+    }
+    .language-btn{
+      background:rgba(255,255,255,0.9);
+      border:1px solid var(--border-light);
+      border-radius:8px;
+      padding:6px 12px;
+      margin:0 4px;
+      font-size:0.9rem;
+      cursor:pointer;
+      transition:all 0.3s ease;
+    }
+    .language-btn:hover, .language-btn.active{
+      background:var(--primary-green);
+      color:white;
+      border-color:var(--primary-green);
+    }
+  </style>
+</head>
+<body>
+  <nav class="app-navbar navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <i class="fas fa-seedling me-2"></i>
+        <span data-translate="site_title">Agriculture Portal</span>
+      </a>
+      
+      <!-- Language Selector -->
+      <div class="language-selector">
+        <select id="languageSelect" class="form-select form-select-sm" onchange="changeLanguage(this.value)">
+          <option value="en">English</option>
+          <option value="hi">हिंदी</option>
+          <option value="nagpuri">नागपुरी</option>
+          <option value="santali">संताली</option>
+        </select>
+      </div>
+    </div>
+  </nav>
+  <script>
+    // Initialize language select for partial header
+    (function(){
+      try{
+        var lang = localStorage.getItem('preferred_language') || 'en';
+        var select = document.getElementById('languageSelect');
+        if(select) select.value = lang;
+      }catch(e){}
+    })();
+    
+    // Smart navigation: from base -> section keeps base in history; section -> section replaces history
+    (function(){
+      function isSection(path){
+        return ['/weather','/farmer','/buyer','/contact','/market','/soil-analysis','/news','/chatbot','/speech-to-text','/text-to-speech','/home','/schemes'].includes(path);
+      }
+      try{
+        document.querySelectorAll('.app-navbar .nav-link[href^="/"]').forEach(function(a){
+          a.addEventListener('click', function(e){
+            if (e.ctrlKey || e.metaKey || a.target === '_blank') return; // allow new tab
+            const href = a.getAttribute('href');
+            if (!href || !href.startsWith('/')) return;
+            e.preventDefault();
+            const current = location.pathname;
+            const fromBase = (current === '/' || current === '/home');
+            if(fromBase && isSection(href)) history.pushState(null, '', href);
+            else if(!fromBase && isSection(href)) history.replaceState(null, '', href);
+            else location.href = href;
+          });
+        });
+      }catch(e){}
+    })();
+    
+    function appLogout(){ 
+      localStorage.removeItem('token'); 
+      localStorage.removeItem('user_type'); 
+      localStorage.removeItem('user_id'); 
+      window.location.href='/'; 
+    }
+    
+    var headerTranslations = {
+      en: {
+        site_title: "Agriculture Portal"
+      },
+      hi: {
+        site_title: "कृषि पोर्टल"
+      },
+      nagpuri: {
+        site_title: "खेती पोर्टल"
+      },
+      santali: {
+        site_title: "हल पोर्टल"
+      }
+    };
+    
+    window.changeLanguage = function(lang){
+      try{ localStorage.setItem('preferred_language', lang); }catch(_){ }
+      var dict = headerTranslations[lang] || headerTranslations.en;
+      document.querySelectorAll('[data-translate]').forEach(function(el){
+        var key = el.getAttribute('data-translate');
+        if (key && dict[key]) { el.textContent = dict[key]; }
+      });
+    };
+  </script>
+</body>
+</html>

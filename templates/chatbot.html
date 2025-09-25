@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #ecfdf5 50%, #fffbeb 100%);
+            min-height: 100vh;
+            color: #1f2937;
+            margin: 0;
+        }
+        .chatbot-container {
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 32px;
+            background: rgba(255,255,255,0.98);
+            border-radius: 24px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            border: 1px solid #e2e8f0;
+        }
+        .chat-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #1a5f1a;
+        }
+        .chat-messages {
+            min-height: 180px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 16px;
+            padding: 8px;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+        .user-message {
+            text-align: right;
+            margin-bottom: 8px;
+        }
+        .bot-message {
+            text-align: left;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        .play-btn {
+            background: #e9ecef;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .play-btn:hover {
+            background: #d1fae5;
+        }
+        .chat-input-area {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+        .voice-btn {
+            background: #f8f9fa;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .voice-btn.listening {
+            background: #ff4444;
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+<div>
+{% include 'partials/header.html' %}
+</div>
+<div class="chatbot-container">
+    <div class="text-center">
+        <div class="chat-title"><i class="fas fa-robot"></i> AI Chatbot</div>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+        <div class="bot-message">
+            <p>Hello! Ask me anything about agriculture, crops, or farming practices!</p>
+        </div>
+    </div>
+    <div class="chat-input-area">
+        <input type="text" id="chatInput" placeholder="Type or use voice..." onkeypress="handleChatKeyPress(event)">
+        <button id="voiceButton" class="voice-btn" onclick="startVoiceInput(event)">
+            <i class="fas fa-microphone"></i>
+        </button>
+        <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+    <div class="mt-2 text-end">
+        <select id="voiceLang" class="form-select form-select-sm w-auto d-inline-block">
+            <option value="en-US">English</option>
+            <option value="hi-IN">हिन्दी</option>
+        </select>
+    </div>
+</div>
+<script>
+    // Voice to text
+    function startVoiceInput(e) {
+        e.preventDefault();
+        const voiceButton = document.getElementById('voiceButton');
+        const chatInput = document.getElementById('chatInput');
+        const lang = document.getElementById('voiceLang').value;
+        if (!('webkitSpeechRecognition' in window)) {
+            alert('Speech recognition is not supported in your browser. Try Chrome or Edge.');
+            return;
+        }
+        const recognition = new webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = lang;
+        voiceButton.classList.add('listening');
+        recognition.start();
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            chatInput.value = transcript;
+            voiceButton.classList.remove('listening');
+        };
+        recognition.onerror = function(event) {
+            voiceButton.classList.remove('listening');
+        };
+        recognition.onend = function() {
+            voiceButton.classList.remove('listening');
+        };
+    }
+    // Text to speech (robust loading + fallbacks)
+    let cachedVoices = [];
+    function loadVoices() {
+        return new Promise(resolve => {
+            const synth = window.speechSynthesis;
+            let voices = synth.getVoices();
+            if (voices && voices.length) {
+                cachedVoices = voices;
+                resolve(voices);
+                return;
+            }
+            const onChange = () => {
+                voices = synth.getVoices();
+                if (voices && voices.length) {
+                    cachedVoices = voices;
+                    synth.onvoiceschanged = null;
+                    resolve(voices);
+                }
+            };
+            synth.onvoiceschanged = onChange;
+            // Fallback in case onvoiceschanged never fires
+            setTimeout(() => resolve(cachedVoices), 1000);
+        });
+    }
+
+    async function speakText(text, lang) {
+        if (!('speechSynthesis' in window)) {
+            alert('Text-to-speech is not supported in your browser.');
+            return;
+        }
+        const synth = window.speechSynthesis;
+        await loadVoices();
+        let voices = synth.getVoices();
+        if (!voices || !voices.length) voices = cachedVoices;
+
+        let voice = voices.find(v => v.lang === lang)
+                || voices.find(v => v.lang && v.lang.toLowerCase().startsWith(lang.split('-')[0].toLowerCase()))
+                || voices.find(v => v.default);
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = lang;
+        if (voice) utterance.voice = voice;
+        utterance.rate = 1;   // adjust if needed
+        utterance.pitch = 1;  // adjust if needed
+
+        try { synth.cancel(); } catch (e) {}
+        synth.speak(utterance);
+    }
+    // Send message
+    async function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        const lang = document.getElementById('voiceLang').value;
+        if (message === '') return;
+        addMessage(message, 'user');
+        input.value = '';
+        const chatMessages = document.getElementById('chatMessages');
+        const typingIndicator = document.createElement('div');
+        typingIndicator.className = 'bot-message';
+        typingIndicator.id = 'typingIndicator';
+        typingIndicator.innerHTML = '<p><i>AI is typing...</i></p>';
+        chatMessages.appendChild(typingIndicator);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        try {
+            const response = await fetch('/api/chatbot/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message })
+            });
+            const data = await response.json();
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+            if (data.response) {
+                addMessage(data.response, 'bot', lang);
+            } else {
+                addMessage("I'm sorry, I couldn't process your request. Please try again.", 'bot', lang);
+            }
+        } catch (error) {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+            addMessage("I'm having trouble connecting to the server. Please check your connection and try again.", 'bot', lang);
+        }
+    }
+    function addMessage(text, sender, lang) {
+        const chatMessages = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `${sender}-message`;
+        if (sender === 'bot') {
+            messageDiv.innerHTML = `<p>${text} <button class='play-btn' onclick='speakText("${text.replace(/"/g, '\\"')}", document.getElementById("voiceLang").value)'><i class='fas fa-play'></i></button></p>`;
+        } else {
+            messageDiv.innerHTML = `<p>${text}</p>`;
+        }
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        if (sender === 'bot') {
+            // Auto-speak the bot reply
+            try { speakText(text, lang); } catch (e) {}
+        }
+    }
+    function handleChatKeyPress(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+</script>
+<script src="/template/translate.js"></script>
+</body>
+</html>

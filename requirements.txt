@@ -1,0 +1,22 @@
+fastapi==0.104.1
+uvicorn==0.23.2
+python-dotenv
+sqlalchemy==2.0.23
+pydantic==2.5.0
+python-multipart==0.0.6
+jinja2==3.1.2
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-decouple==3.8
+requests>=2.32.0
+pandas>=2.2.0
+numpy>=2.0.0
+scikit-learn>=1.4.0
+speechrecognition==3.10.0
+pyttsx3==2.90
+googletrans-py>=4.0.0rc1
+google-generativeai==0.3.2
+
+# Image processing for soil analysis
+Pillow==10.3.0
+Pillow-Heif>=0.16.0

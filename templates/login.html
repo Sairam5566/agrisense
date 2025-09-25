@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Agriculture Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Poppins:wght@600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --earth-brown:#7c4a24; --wheat:#f5e6c8; --leaf:#2d8f47; --dark:#1f2937; --soft:#faf7f2; --accent:#0084ff;
+      --light-green:#8fd8a0; --primary-green:#2d8f47; --wheat-gold:#f5e6c8; --border-light:#e0e7ff;
+      --shadow-sm:0 2px 8px rgba(0,0,0,.08); --shadow-md:0 4px 16px rgba(0,0,0,.12); --shadow-lg:0 8px 24px rgba(0,0,0,.15);
+    }
+    
+    body{
+      font-family:'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; 
+      background: linear-gradient(120deg, var(--soft), #eef7ff); 
+      min-height:100vh;
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* Override header styles for login page */
+    .app-navbar {
+      background: rgba(255, 255, 255, 0.95) !important;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-light);
+      padding: 12px 0 !important;
+    }
+    
+    .navbar-brand {
+      font-size: 1.6rem !important;
+      color: var(--primary-green) !important;
+    }
+    
+    .language-selector {
+      position: relative !important;
+      top: auto !important;
+      right: auto !important;
+    }
+    
+    .brand{font-family:'Poppins', sans-serif; font-weight:800; color:var(--leaf);}
+    .login-wrap{max-width:980px; margin:20px auto; padding: 0 15px;}
+    .card-login{
+      border:none; 
+      border-radius:20px; 
+      overflow:hidden; 
+      box-shadow:var(--shadow-lg);
+      background: rgba(255, 255, 255, 0.98);
+    } 
+    .left-pane{
+      background:linear-gradient(135deg, var(--wheat), #f0e6d2); 
+      padding:32px;
+    }
+    .left-pane .hero{
+      background:linear-gradient(135deg, var(--primary-green), #1a5f1a); 
+      color:#fff; 
+      border-radius:16px; 
+      padding:28px;
+      box-shadow: var(--shadow-md);
+    }
+    .left-pane .hero h2{
+      font-family:'Poppins'; 
+      font-weight:800;
+      margin-bottom: 8px;
+    }
+    .left-pane .points li{
+      margin-bottom:10px;
+      color: var(--dark);
+      font-weight: 500;
+    }
+    .right-pane{
+      padding:32px;
+      background: rgba(255, 255, 255, 0.98);
+    }
+    .role-pill .nav-link{
+      border-radius:999px;
+      padding: 8px 16px;
+      margin: 0 4px;
+    }
+    .btn-agri{
+      background:linear-gradient(135deg, var(--primary-green), #1a5f1a); 
+      color:#fff; 
+      border:none;
+      padding: 12px 24px;
+      font-weight: 600;
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+    .btn-agri:hover{
+      filter:brightness(1.1);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    } 
+    .text-link{
+      cursor:pointer; 
+      color:var(--accent);
+      font-weight: 500;
+    } 
+    .text-link:hover{
+      text-decoration:underline;
+    }
+    
+    .form-control {
+      border-radius: 10px;
+      border: 1px solid var(--border-light);
+      padding: 12px 16px;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+      border-color: var(--primary-green);
+      box-shadow: 0 0 0 0.2rem rgba(45, 143, 71, 0.25);
+    }
+    
+    .form-select {
+      border-radius: 10px;
+      border: 1px solid var(--border-light);
+      padding: 12px 16px;
+    }
+    
+    .alert {
+      border-radius: 10px;
+      border: none;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .login-wrap {
+        margin: 10px auto;
+        padding: 0 10px;
+      }
+      .left-pane, .right-pane {
+        padding: 24px;
+      }
+      .navbar-brand {
+        font-size: 1.4rem !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Simplified Navigation for Login -->
+  <nav class="app-navbar navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <i class="fas fa-seedling me-2"></i>
+        <span data-translate="site_title">Agriculture Portal</span>
+      </a>
+      
+      <!-- Language Selector -->
+      <div class="language-selector">
+        <select id="languageSelect" class="form-select form-select-sm" onchange="changeLanguage(this.value)">
+          <option value="en">English</option>
+          <option value="hi">हिंदी</option>
+          <option value="nagpuri">नागपुरी</option>
+          <option value="santali">संताली</option>
+        </select>
+      </div>
+    </div>
+  </nav>
+  <div class="login-wrap">
+    <div class="card card-login">
+      <div class="row g-0">
+        <div class="col-lg-5 left-pane">
+          <div class="hero mb-3">
+            <div class="d-flex align-items-center gap-3">
+              <div style="font-size:2.2rem">🌾</div>
+              <div>
+                <h2 class="mb-1">Welcome</h2>
+                <div class="small">Simple login designed for farmers and buyers</div>
+              </div>
+            </div>
+          </div>
+          <ul class="points list-unstyled small mb-0">
+            <li>• Easy Farmer-first login</li>
+            <li>• Buyer portal shows farmer listings count</li>
+            <li>• Post crop listings and buyer requirements</li>
+          </ul>
+        </div>
+        <div class="col-lg-7 right-pane">
+          <h4 class="fw-bold mb-3"><i class="fas fa-lock"></i> Login</h4>
+          <div class="mb-3">
+            <label class="form-label">Login as</label>
+            <select id="roleSelect" class="form-select">
+              <option value="farmer" selected>Farmer</option>
+              <option value="customer">Buyer</option>
+            </select>
+          </div>
+          <div class="row g-2">
+            <!-- Farmer mobile login -->
+            <div class="col-12" id="farmerMobileGroup" style="display:none;">
+              <label class="form-label">Mobile</label>
+              <input id="mobile" type="tel" class="form-control" placeholder="10-digit mobile" />
+            </div>
+            <!-- Buyer email login -->
+            <div class="col-12" id="emailGroup">
+              <label class="form-label">Email</label>
+              <input id="email" type="email" class="form-control" placeholder="name@example.com" />
+            </div>
+            <div class="col-12">
+              <label class="form-label">Password</label>
+              <input id="password" type="password" class="form-control" placeholder="••••••••" />
+            </div>
+          </div>
+          <div class="d-grid mt-3">
+            <button id="loginBtn" class="btn btn-agri btn-lg"><i class="fas fa-right-to-bracket"></i> Login</button>
+          </div>
+          <div id="loginError" class="alert alert-danger d-none mt-3"></div>
+
+          <hr class="my-4">
+          <div class="d-flex align-items-center justify-content-between">
+            <h5 class="fw-bold mb-0"><i class="fas fa-user-plus"></i> Create New ID</h5>
+            <span class="text-link" data-bs-toggle="collapse" data-bs-target="#signupArea">Show/Hide</span>
+          </div>
+
+          <div id="signupArea" class="collapse mt-3">
+            <ul class="nav nav-pills role-pill mb-3" id="pills-tab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="farmer-tab" data-bs-toggle="pill" data-bs-target="#farmer-signup" type="button" role="tab">Farmer</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="buyer-tab" data-bs-toggle="pill" data-bs-target="#buyer-signup" type="button" role="tab">Buyer</button>
+              </li>
+            </ul>
+            <div class="tab-content" id="pills-tabContent">
+              <!-- Farmer Signup (Simple) -->
+              <div class="tab-pane fade show active" id="farmer-signup" role="tabpanel">
+                <div class="row g-2">
+                  <div class="col-md-12"><label class="form-label">Name</label><input id="f_name" class="form-control" placeholder="Farmer Name"></div>
+                  <div class="col-md-12"><label class="form-label">Mobile</label><input id="f_phone" class="form-control" placeholder="10-digit mobile"></div>
+                  <div class="col-md-6"><label class="form-label">Password</label><input id="f_password" type="password" class="form-control" placeholder="Create password"></div>
+                  <div class="col-md-6"><label class="form-label">Confirm Password</label><input id="f_confirm" type="password" class="form-control" placeholder="Re-enter password"></div>
+                </div>
+                <div class="d-grid mt-3"><button id="farmerSignupBtn" class="btn btn-outline-success"><i class="fas fa-user-plus"></i> Create Farmer ID</button></div>
+                <div id="farmerSignupMsg" class="small mt-2"></div>
+              </div>
+              <!-- Buyer Signup -->
+              <div class="tab-pane fade" id="buyer-signup" role="tabpanel">
+                <div class="row g-2">
+                  <div class="col-md-6"><label class="form-label">Name</label><input id="b_name" class="form-control"></div>
+                  <div class="col-md-6"><label class="form-label">Email</label><input id="b_email" type="email" class="form-control"></div>
+                  <div class="col-md-6"><label class="form-label">Password</label><input id="b_password" type="password" class="form-control"></div>
+                  <div class="col-md-6"><label class="form-label">Phone</label><input id="b_phone" class="form-control"></div>
+                  <div class="col-md-4"><label class="form-label">Address</label><input id="b_address" class="form-control"></div>
+                  <div class="col-md-4"><label class="form-label">City</label><input id="b_city" class="form-control"></div>
+                  <div class="col-md-4"><label class="form-label">Pincode</label><input id="b_pincode" class="form-control"></div>
+                  <div class="col-md-4"><label class="form-label">State</label><input id="b_state" class="form-control"></div>
+                </div>
+                <div class="d-grid mt-3"><button id="buyerSignupBtn" class="btn btn-outline-primary"><i class="fas fa-user-plus"></i> Create Buyer ID</button></div>
+                <div id="buyerSignupMsg" class="small mt-2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="text-center text-muted small py-3">&copy; 2025 Agriculture Portal</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    async function login(){
+      const role = document.getElementById('roleSelect').value; // farmer or customer
+      const password = document.getElementById('password').value.trim();
+      const fd = new FormData();
+      fd.append('user_type', role);
+      fd.append('password', password);
+      if(role === 'farmer'){
+        const phone = document.getElementById('mobile').value.trim();
+        fd.append('phone_no', phone);
+      } else {
+        const email = document.getElementById('email').value.trim();
+        fd.append('email', email);
+      }
+      const res = await fetch('/api/auth/login', {method:'POST', body:fd});
+      const errEl = document.getElementById('loginError');
+      if(!res.ok){ errEl.classList.remove('d-none'); errEl.textContent = 'Login failed. Check credentials.'; return; }
+      const data = await res.json();
+      localStorage.setItem('token', data.access_token);
+      localStorage.setItem('user_type', data.user_type);
+      localStorage.setItem('user_id', data.user_id);
+      if(data.user_type === 'farmer') window.location.href = '/home';
+      else window.location.href = '/buyer';
+    }
+    document.getElementById('loginBtn').addEventListener('click', login);
+
+    async function farmerSignup(){
+      const name = document.getElementById('f_name').value.trim();
+      const phone = document.getElementById('f_phone').value.trim();
+      const pass = document.getElementById('f_password').value;
+      const confirm = document.getElementById('f_confirm').value;
+      const msg = document.getElementById('farmerSignupMsg');
+      msg.className = 'small mt-2';
+      if(!name || !phone || !pass || !confirm){ msg.textContent='Please fill all fields'; msg.classList.add('text-danger'); return; }
+      if(pass !== confirm){ msg.textContent='Passwords do not match'; msg.classList.add('text-danger'); return; }
+      const fd = new FormData();
+      fd.append('name', name);
+      fd.append('phone_no', phone);
+      fd.append('password', pass);
+      const res = await fetch('/api/auth/farmer/register', {method:'POST', body:fd});
+      if(res.ok){ msg.textContent = 'Farmer ID created successfully. You can login now.'; msg.classList.add('text-success'); }
+      else {
+        let detail = 'Failed to create Farmer ID';
+        try{ const j = await res.json(); if(j && (j.detail || j.message)) detail = j.detail || j.message; }catch(e){ try{ detail = await res.text(); }catch(_){} }
+        msg.textContent = detail;
+        msg.classList.add('text-danger');
+      }
+    }
+    document.getElementById('farmerSignupBtn').addEventListener('click', farmerSignup);
+
+    async function buyerSignup(){
+      const fd = new FormData();
+      fd.append('name', document.getElementById('b_name').value);
+      fd.append('email', document.getElementById('b_email').value);
+      fd.append('password', document.getElementById('b_password').value);
+      fd.append('phone_no', document.getElementById('b_phone').value);
+      fd.append('address', document.getElementById('b_address').value || '');
+      fd.append('city', document.getElementById('b_city').value || '');
+      fd.append('pincode', document.getElementById('b_pincode').value || '');
+      fd.append('state', document.getElementById('b_state').value || '');
+      const res = await fetch('/api/auth/customer/register', {method:'POST', body:fd});
+      const msg = document.getElementById('buyerSignupMsg');
+      msg.className = 'small mt-2';
+      if(res.ok){ msg.textContent = 'Buyer ID created successfully. You can login now.'; msg.classList.add('text-success'); }
+      else {
+        let detail = 'Failed to create Buyer ID';
+        try{ const j = await res.json(); if(j && (j.detail || j.message)) detail = j.detail || j.message; }catch(e){ try{ detail = await res.text(); }catch(_){} }
+        msg.textContent = detail;
+        msg.classList.add('text-danger');
+      }
+    }
+    document.getElementById('buyerSignupBtn').addEventListener('click', buyerSignup);
+
+    // Toggle login fields by role
+    function toggleLoginFields(){
+      const role = document.getElementById('roleSelect').value;
+      const farmer = role === 'farmer';
+      document.getElementById('farmerMobileGroup').style.display = farmer ? '' : 'none';
+      document.getElementById('emailGroup').style.display = farmer ? 'none' : '';
+    }
+    document.getElementById('roleSelect').addEventListener('change', toggleLoginFields);
+    document.addEventListener('DOMContentLoaded', toggleLoginFields);
+  </script>
+  <script>
+    // Language functionality for login page
+    (function(){
+      try{
+        var lang = localStorage.getItem('preferred_language') || 'en';
+        var select = document.getElementById('languageSelect');
+        if(select) select.value = lang;
+      }catch(e){}
+    })();
+    
+    var loginTranslations = {
+      en: {
+        site_title: "Agriculture Portal"
+      },
+      hi: {
+        site_title: "कृषि पोर्टल"
+      },
+      nagpuri: {
+        site_title: "खेती पोर्टल"
+      },
+      santali: {
+        site_title: "हल पोर्टल"
+      }
+    };
+    
+    window.changeLanguage = function(lang){
+      try{ localStorage.setItem('preferred_language', lang); }catch(_){ }
+      var dict = loginTranslations[lang] || loginTranslations.en;
+      document.querySelectorAll('[data-translate]').forEach(function(el){
+        var key = el.getAttribute('data-translate');
+        if (key && dict[key]) { el.textContent = dict[key]; }
+      });
+    };
+  </script>
+  <script src="/template/translate.js"></script>
+</body>
+</html>

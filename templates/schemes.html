@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Government Schemes - Agriculture Portal</title>
+    <script src="/template/translate.js"></script>
+    
+    <!-- CSS Frameworks and Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-green: #1a5f1a;
+            --secondary-green: #2d8f47;
+            --light-green: #4ade80;
+            --earth-brown: #92400e;
+            --light-brown: #d97706;
+            --wheat-gold: #fbbf24;
+            --sky-blue: #0ea5e9;
+            --text-dark: #1f2937;
+            --text-light: #ffffff;
+            --bg-light: #f8fafc;
+            --border-light: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #ecfdf5 50%, #fffbeb 100%);
+            min-height: 100vh;
+            color: var(--text-dark);
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        /* Modern Navigation */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-lg);
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 0;
+        }
+
+        .navbar-brand {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.75rem;
+            color: var(--text-light) !important;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .navbar-brand i {
+            margin-right: 12px;
+            font-size: 2rem;
+            color: var(--wheat-gold);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .nav-link {
+            color: var(--text-light) !important;
+            font-weight: 500;
+            margin: 0 8px;
+            padding: 10px 18px !important;
+            border-radius: 50px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-link:hover::before {
+            left: 100%;
+        }
+
+        /* Language Selector */
+        .language-selector {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            z-index: 1050;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-light);
+        }
+
+        .language-btn {
+            display: block;
+            width: 100%;
+            margin: 4px 0;
+            padding: 10px 16px;
+            border: none;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            min-height: 44px;
+            cursor: pointer;
+        }
+
+        .language-btn:hover, .language-btn.active {
+            background: var(--primary-green);
+            color: var(--text-light);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Scheme Cards */
+        .scheme-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid var(--border-light);
+            position: relative;
+            overflow: hidden;
+            min-height: 400px;
+            height: 100%;
+        }
+
+        .scheme-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--light-green), var(--wheat-gold));
+        }
+
+        .scheme-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--light-green);
+        }
+
+        .scheme-icon {
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 24px;
+            display: block;
+        }
+
+        .scheme-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 16px;
+        }
+
+        .scheme-income-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .income-small {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .income-medium {
+            background-color: #fef9c3;
+            color: #854d0e;
+        }
+
+        .income-large {
+            background-color: #ffe4e6;
+            color: #be123c;
+        }
+
+        /* Modern Buttons */
+        .btn-agriculture {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: var(--text-light);
+            border: none;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-md);
+            min-height: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-agriculture::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-agriculture:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: var(--text-light);
+        }
+
+        .btn-agriculture:hover::before {
+            left: 100%;
+        }
+
+        /* Modern Forms */
+        .form-control {
+            border-radius: 16px;
+            border: 2px solid var(--border-light);
+            padding: 14px 20px;
+            font-size: 16px;
+            min-height: 48px;
+            transition: all 0.3s ease;
+            background: var(--bg-light);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 4px rgba(26, 95, 26, 0.1);
+            background: white;
+        }
+
+        /* Income Filter Section */
+        .income-filter {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 30px;
+            border: 1px solid var(--border-light);
+        }
+
+        .income-filter-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Loading Animation */
+        .loading {
+            opacity: 0;
+            animation: fadeIn 0.6s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Accessibility Improvements */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Focus Styles */
+        .btn-agriculture:focus,
+        .language-btn:focus,
+        .nav-link:focus {
+            outline: 2px solid var(--wheat-gold);
+            outline-offset: 2px;
+        }
+
+        /* High Contrast Support */
+        @media (prefers-contrast: high) {
+            .scheme-card {
+                border: 2px solid var(--text-dark);
+            }
+            
+            .btn-agriculture {
+                border: 2px solid var(--text-dark);
+            }
+        }
+
+        /* Reduced Motion Support */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .language-selector {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 20px auto;
+                width: fit-content;
+            }
+            
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+            
+            .scheme-card {
+                padding: 20px;
+                min-height: 350px;
+            }
+        }
+
+        /* Ensure 2 columns on medium and larger screens */
+        @media (min-width: 768px) {
+            .scheme-card {
+                min-height: 450px;
+            }
+        }
+
+        /* Force 2-column layout */
+        #schemesList {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        #schemesList > div {
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+
+        @media (max-width: 767px) {
+            #schemesList > div {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    {% include 'partials/header.html' %}
+    
+
+    <!-- Main Content -->
+    <main class="container py-5">
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-success">
+                <i class="fas fa-landmark me-3"></i>
+                <span data-translate="gov_schemes">Government Schemes for Farmers</span>
+            </h1>
+            <p class="lead" data-translate="schemes_desc">
+                Find the best government schemes based on your income category and region
+            </p>
+        </div>
+
+        <!-- Income Filter Section -->
+        <section class="income-filter">
+            <h2 class="income-filter-title" data-translate="filter_by_income">Filter Schemes by Annual Income</h2>
+            <div class="row justify-content-center">
+                <div class="col-md-3 mb-3">
+                    <button class="btn btn-agriculture w-100" onclick="filterSchemes('small')">
+                        <i class="fas fa-user me-2"></i>
+                        <span data-translate="small_farmers">Small Farmers (&lt; ₹2L)</span>
+                    </button>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <button class="btn btn-agriculture w-100" onclick="filterSchemes('medium')">
+                        <i class="fas fa-users me-2"></i>
+                        <span data-translate="medium_farmers">Medium Farmers (₹2L-10L)</span>
+                    </button>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <button class="btn btn-agriculture w-100" onclick="filterSchemes('large')">
+                        <i class="fas fa-building me-2"></i>
+                        <span data-translate="large_farmers">Large Farmers (&gt; ₹10L)</span>
+                    </button>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <button class="btn btn-secondary-agriculture w-100" onclick="showCustomFilter()">
+                        <i class="fas fa-filter me-2"></i>
+                        <span data-translate="custom_filter">Custom Filter</span>
+                    </button>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <button class="btn btn-outline-success w-100" onclick="showAllSchemes()">
+                        <i class="fas fa-list me-2"></i>
+                        <span data-translate="show_all">Show All</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Custom Income Filter -->
+            <div id="customFilter" class="mt-4" style="display: none;">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text">₹</span>
+                            <input type="number" class="form-control" id="incomeInput" placeholder="Enter your annual income" min="0">
+                            <button class="btn btn-agriculture" onclick="filterByCustomIncome()">
+                                <i class="fas fa-search me-2"></i>
+                                <span data-translate="find_schemes">Find Schemes</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Schemes Display Section -->
+        <section id="schemesContainer">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 data-translate="all_schemes">All Government Schemes</h3>
+                <button class="btn btn-outline-primary" onclick="refreshSchemes()">
+                    <i class="fas fa-sync-alt me-2"></i>
+                    <span data-translate="refresh_data">Refresh Data</span>
+                </button>
+            </div>
+            
+            <!-- Loading indicator -->
+            <div id="loadingIndicator" class="text-center" style="display: none;">
+                <div class="spinner-border text-success" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <p class="mt-2" data-translate="loading_schemes">Loading schemes...</p>
+            </div>
+            
+            <!-- Schemes will be loaded here dynamically -->
+            <div id="schemesList" class="row">
+                <!-- Schemes will be populated by JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <p>&copy; 2025 Agriculture Portal. All rights reserved.</p>
+                    <p class="text-muted">Agricultural advice is for guidance only. Consult local experts for specific recommendations.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Global variable to store all schemes
+        let allSchemes = [];
+        
+        // Function to show custom filter
+        function showCustomFilter() {
+            const customFilter = document.getElementById('customFilter');
+            customFilter.style.display = customFilter.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        // Function to show loading indicator
+        function showLoading() {
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('schemesList').style.display = 'none';
+        }
+        
+        // Function to hide loading indicator
+        function hideLoading() {
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('schemesList').style.display = 'block';
+        }
+        
+        // Function to fetch all schemes from backend
+        async function fetchAllSchemes() {
+            try {
+                showLoading();
+                const response = await fetch('/api/schemes/');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch schemes');
+                }
+                const schemes = await response.json();
+                allSchemes = schemes;
+                displaySchemes(schemes);
+                hideLoading();
+            } catch (error) {
+                console.error('Error fetching schemes:', error);
+                hideLoading();
+                alert('Error loading schemes. Please try again.');
+            }
+        }
+        
+        // Function to filter schemes by custom income
+        async function filterByCustomIncome() {
+            const income = document.getElementById('incomeInput').value;
+            if (income && income > 0) {
+                try {
+                    showLoading();
+                    const response = await fetch(`/api/schemes/eligible/${income}`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch eligible schemes');
+                    }
+                    const schemes = await response.json();
+                    displaySchemes(schemes);
+                    hideLoading();
+                } catch (error) {
+                    console.error('Error filtering schemes:', error);
+                    hideLoading();
+                    alert('Error filtering schemes. Please try again.');
+                }
+            } else {
+                alert('Please enter a valid annual income');
+            }
+        }
+        
+        // Function to filter schemes by category
+        async function filterSchemes(category) {
+            try {
+                showLoading();
+                const response = await fetch(`/api/schemes/?category=${category}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch schemes by category');
+                }
+                const schemes = await response.json();
+                displaySchemes(schemes);
+                hideLoading();
+            } catch (error) {
+                console.error('Error filtering schemes:', error);
+                hideLoading();
+                alert('Error filtering schemes. Please try again.');
+            }
+        }
+        
+        // Function to show all schemes
+        function showAllSchemes() {
+            displaySchemes(allSchemes);
+        }
+        
+        // Function to refresh schemes data
+        async function refreshSchemes() {
+            try {
+                showLoading();
+                const response = await fetch('/api/schemes/refresh', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to refresh schemes');
+                }
+                
+                const result = await response.json();
+                
+                // Fetch updated schemes
+                await fetchAllSchemes();
+                
+                // Show success message
+                alert(`Successfully refreshed ${result.count} schemes at ${result.timestamp}`);
+                
+            } catch (error) {
+                console.error('Error refreshing schemes:', error);
+                hideLoading();
+                alert('Error refreshing schemes. Please try again.');
+            }
+        }
+        
+        // Function to display schemes
+        function displaySchemes(schemes) {
+            const schemesList = document.getElementById('schemesList');
+            
+            if (schemes.length === 0) {
+                schemesList.innerHTML = `
+                    <div class="col-12 text-center">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No schemes found matching your criteria.
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            let schemesHTML = '';
+            schemes.forEach(scheme => {
+                const incomeBadges = scheme.income_category.map(category => {
+                    let badgeClass = '';
+                    let badgeText = '';
+                    
+                    switch(category) {
+                        case 'small':
+                            badgeClass = 'income-small';
+                            badgeText = 'Small Farmers';
+                            break;
+                        case 'medium':
+                            badgeClass = 'income-medium';
+                            badgeText = 'Medium Farmers';
+                            break;
+                        case 'large':
+                            badgeClass = 'income-large';
+                            badgeText = 'Large Farmers';
+                            break;
+                    }
+                    
+                    return `<span class="scheme-income-badge ${badgeClass}">${badgeText}</span>`;
+                }).join(' ');
+                
+                schemesHTML += `
+                    <div class="col-12 col-md-6 col-lg-6 mb-4">
+                        <div class="scheme-card h-100 d-flex flex-column">
+                            <h4 class="scheme-title">${scheme.name}</h4>
+                            ${incomeBadges}
+                            <p class="mt-3 flex-grow-1">${scheme.description}</p>
+                            <div class="mt-3">
+                                <strong>Eligibility:</strong> ${scheme.eligibility}
+                            </div>
+                            <div class="mt-2">
+                                <strong>Benefits:</strong> ${scheme.benefits}
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                <small class="text-muted">Last Updated: ${scheme.last_updated}</small>
+                                <a href="${scheme.application_link}" target="_blank" class="btn btn-agriculture btn-sm">
+                                    <i class="fas fa-external-link-alt me-1"></i> Apply Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            schemesList.innerHTML = schemesHTML;
+        }
+        
+        // Load all schemes when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchAllSchemes();
+        });
+        
+        // Translation dictionary
+        const translations = {
+            en: {
+                gov_schemes: "Government Schemes for Farmers",
+                schemes_desc: "Find the best government schemes based on your income category and region",
+                filter_by_income: "Filter Schemes by Annual Income",
+                small_farmers: "Small Farmers (< ₹2L)",
+                medium_farmers: "Medium Farmers (₹2L-10L)",
+                large_farmers: "Large Farmers (> ₹10L)",
+                custom_filter: "Custom Filter",
+                find_schemes: "Find Schemes",
+                all_schemes: "All Government Schemes",
+                loading_schemes: "Loading schemes..."
+            },
+            hi: {
+                gov_schemes: "किसानों के लिए सरकारी योजनाएं",
+                schemes_desc: "अपनी आय श्रेणी और क्षेत्र के आधार पर सरकारी योजनाएं खोजें",
+                filter_by_income: "वार्षिक आय के आधार पर योजनाएं फ़िल्टर करें",
+                small_farmers: "छोटे किसान (< ₹2 लाख)",
+                medium_farmers: "मध्यम किसान (₹2 लाख-10 लाख)",
+                large_farmers: "बड़े किसान (> ₹10 लाख)",
+                custom_filter: "कस्टम फ़िल्टर",
+                find_schemes: "योजनाएं खोजें",
+                all_schemes: "सभी सरकारी योजनाएं",
+                loading_schemes: "योजनाएं लोड हो रही हैं..."
+            },
+            te: {
+                gov_schemes: "రైతుల కోసం ప్రభుత్వ పథకాలు",
+                schemes_desc: "మీ ఆదాయ వర్గం మరియు ప్రాంతం ఆధారంగా ఉత్తమ ప్రభుత్వ పథకాలను కనుగొనండి",
+                filter_by_income: "సంవత్సరానికి ఆదాయం ఆధారంగా పథకాలను వడకట్టండి",
+                small_farmers: "చిన్న రైతులు (< ₹2 లక్షలు)",
+                medium_farmers: "మధ్యస్థ రైతులు (₹2 లక్షలు-10 లక్షలు)",
+                large_farmers: "పెద్ద రైతులు (> ₹10 లక్షలు)",
+                custom_filter: "అనుకూల వడపోత",
+                find_schemes: "పథకాలను కనుగొనండి",
+                all_schemes: "అన్ని ప్రభుత్వ పథకాలు",
+                loading_schemes: "పథకాలు లోడవుతున్నాయి..."
+            },
+            ta: {
+                gov_schemes: "விவசாயிகளுக்கான அரசு திட்டங்கள்",
+                schemes_desc: "உங்கள் வருமான வகை மற்றும் பகுதியை அடிப்படையாகக் கொண்டு சிறந்த அரசு திட்டங்களைக் கண்டறியவும்",
+                filter_by_income: "ஆண்டு வருமானத்தின் அடிப்படையில் திட்டங்களை வடிகட்டவும்",
+                small_farmers: "சிறிய விவசாயிகள் (< ₹2லட்சம்)",
+                medium_farmers: "நடுத்தர விவசாயிகள் (₹2லட்சம்-10லட்சம்)",
+                large_farmers: "பெரிய விவசாயிகள் (> ₹10லட்சம்)",
+                custom_filter: "விருப்ப வடிப்பான்",
+                find_schemes: "திட்டங்களைக் கண்டுபிடி",
+                all_schemes: "அனைத்து அரசு திட்டங்கள்",
+                loading_schemes: "திட்டங்கள் ஏற்றப்படுகின்றன..."
+            }
+        };
+        
+        // Initialize translations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default language
+            changeLanguage('en');
+        });
+    </script>
+</body>
+</html>

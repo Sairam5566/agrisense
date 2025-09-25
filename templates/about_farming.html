@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Farming - Agriculture Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: linear-gradient(135deg, #f0f9ff 0%, #ecfdf5 50%, #fffbeb 100%); min-height: 100vh; color: #1f2937; }
+    .navbar { background: linear-gradient(135deg, #1a5f1a 0%, #2d8f47 100%); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
+    .navbar .nav-link, .navbar .navbar-brand { color: #fff !important; }
+    .hero { padding: 72px 0; color: #fff; text-align: center; background: linear-gradient(135deg, rgba(26,95,26,0.92), rgba(45,143,71,0.85)); }
+    .hero h1 { font-family: 'Poppins', sans-serif; font-weight: 800; }
+    .section-card { background: rgba(255,255,255,0.98); border: 1px solid #e2e8f0; border-radius: 18px; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.08); padding: 22px; }
+    .section-title { font-family: 'Poppins', sans-serif; color: #1a5f1a; font-weight: 700; }
+    .icon { color: #1a5f1a; }
+    .badge-soft { background: #e8f5e9; color: #1a5f1a; }
+    .table th { color: #1a5f1a; }
+  </style>
+</head>
+  <!-- Restored Shared Header: templates/partials/header.html -->
+  <style>
+    :root { --primary-green:#1a5f1a; --secondary-green:#2d8f47; --text-light:#fff; }
+    .app-navbar { background: linear-gradient(135deg, var(--primary-green), var(--secondary-green)); box-shadow: 0 6px 16px rgba(0,0,0,.15); padding: 12px 0; margin-bottom: 0; }
+    .app-navbar .navbar-brand { color: var(--text-light); font-weight:700; text-decoration:none; display:flex; align-items:center; gap:10px; }
+    .app-navbar .nav-link { color: var(--text-light); font-weight:500; margin: 0 6px; }
+    .app-navbar .nav-link:hover { opacity:.9; }
+    .app-navbar .lang-select { min-width: 160px; border-radius: 999px; padding: .25rem .75rem; }
+  </style>
+  <nav class="app-navbar navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <i class="fas fa-seedling"></i>
+        <span data-translate="site_title">Agriculture Portal</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item d-flex align-items-center me-2">
+            <i class="fas fa-globe text-white me-2"></i>
+            <select id="langSelectPartial" class="form-select form-select-sm lang-select">
+              <option value="en">English</option>
+              <option value="hi">हिंदी</option>
+              <option value="nagpuri">नागपुरी</option>
+              <option value="santali">संताली</option>
+            </select>
+          </li>
+          <li class="nav-item"><a class="nav-link" href="/home"><i class="fas fa-home"></i> <span data-translate="home">Home</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="/weather"><i class="fas fa-cloud-sun"></i> <span data-translate="weather">Weather</span></a></li>
+          <li class="nav-item d-none" id="navFarmer"><a class="nav-link" href="/farmer"><i class="fas fa-tractor"></i> <span data-translate="farmer_portal">Farmer Portal</span></a></li>
+          <li class="nav-item d-none" id="navBuyer"><a class="nav-link" href="/buyer"><i class="fas fa-store"></i> <span data-translate="buyer_portal">Buyer Portal</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="/contact"><i class="fas fa-envelope"></i> <span data-translate="contact">Contact</span></a></li>
+          <li class="nav-item d-none" id="navLogout"><a class="nav-link" href="#" onclick="appLogout()"><i class="fas fa-right-from-bracket"></i> <span data-translate="logout">Logout</span></a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <script>
+    // Initialize language select for partial header
+    (function(){
+      try{
+        var sel = document.getElementById('langSelectPartial');
+        if (!sel) return;
+        var saved = localStorage.getItem('preferred_language') || 'en';
+        if ([...sel.options].some(o => o.value === saved)) sel.value = saved;
+        sel.addEventListener('change', function(e){
+          if (typeof window.changeLanguage === 'function') { window.changeLanguage(e.target.value); }
+          // Ensure body content also updates immediately if translate.js is present
+          if (typeof window.translateDynamicContent === 'function') { window.translateDynamicContent(e.target.value); }
+          else { try { localStorage.setItem('preferred_language', e.target.value); } catch(_){} }
+        });
+      }catch(err){ console.warn(err); }
+    })();
+    // Toggle header items by login state
+    (function(){
+      var ut = localStorage.getItem('user_type');
+      var token = localStorage.getItem('token');
+      var farmer = document.getElementById('navFarmer');
+      var buyer = document.getElementById('navBuyer');
+      var logout = document.getElementById('navLogout');
+      if(token){
+        if(ut === 'farmer' && farmer) farmer.classList.remove('d-none');
+        if(ut === 'customer' && buyer) buyer.classList.remove('d-none');
+        if(logout) logout.classList.remove('d-none');
+      }
+    })();
+    function appLogout(){ localStorage.removeItem('token'); localStorage.removeItem('user_type'); localStorage.removeItem('user_id'); window.location.href='/'; }
+    // Smart navigation: from base -> section keeps base in history; section -> section replaces history
+    (function(){
+      function isSection(path){
+        return ['/weather','/farmer','/buyer','/contact','/market','/soil-analysis','/news','/chatbot','/speech-to-text','/text-to-speech','/home'].includes(path);
+      }
+      try{
+        document.querySelectorAll('.app-navbar .nav-link[href^="/"]').forEach(function(a){
+          a.addEventListener('click', function(e){
+            if (e.ctrlKey || e.metaKey || a.target === '_blank') return; // allow new tab
+            const href = a.getAttribute('href');
+            if (!href || !href.startsWith('/')) return;
+            e.preventDefault();
+            const current = location.pathname;
+            const fromBase = (current === '/' || current === '/home');
+            const toSection = isSection(href);
+            if (!toSection){
+              window.location.href = href; // normal
+            } else if (fromBase){
+              window.location.href = href; // keep base in history
+            } else {
+              window.location.replace(href); // moving between sections => no extra history
+            }
+          });
+        });
+      }catch(err){ console.warn(err); }
+    })();
+    // Fallback translations for pages that don't define changeLanguage (non-base pages)
+    (function(){
+      try{
+        if (typeof window.changeLanguage !== 'function'){
+          var headerTranslations = {
+            en: {
+              site_title: "Agriculture Portal",
+              home: "Home",
+              contact: "Contact",
+              weather: "Weather",
+              disease_prediction: "Disease Prediction",
+              farmer_portal: "Farmer Portal",
+              buyer_portal: "Buyer Portal",
+              logout: "Logout"
+            },
+            hi: {
+              site_title: "कृषि पोर्टल",
+              home: "होम",
+              contact: "संपर्क",
+              weather: "मौसम",
+              disease_prediction: "बीमारी पूर्वानुमान",
+              farmer_portal: "किसान पोर्टल",
+              buyer_portal: "खरीदार पोर्टल",
+              logout: "लॉगआउट"
+            },
+            nagpuri: {
+              site_title: "खेती पोर्टल",
+              home: "घर",
+              contact: "संपर्क",
+              weather: "मौसम",
+              disease_prediction: "बीमारी देखाइ",
+              farmer_portal: "किसान पोर्टल",
+              buyer_portal: "खरीदार पोर्टल",
+              logout: "लॉगआउट"
+            },
+            santali: {
+              site_title: "हल पोर्टल",
+              home: "ओड़ाक्",
+              contact: "जोगाजोग",
+              weather: "मौसम",
+              disease_prediction: "रोग ओड़ाय",
+              farmer_portal: "हल कोरा पोर्टल",
+              buyer_portal: "क्रेता पोर्टल",
+              logout: "लॉगआउट"
+            }
+          };
+          window.changeLanguage = function(lang){
+            try{ localStorage.setItem('preferred_language', lang); }catch(_){ }
+            var dict = headerTranslations[lang] || headerTranslations.en;
+            document.querySelectorAll('[data-translate]').forEach(function(el){
+              var key = el.getAttribute('data-translate');
+              if (key && dict[key]) { el.textContent = dict[key]; }
+            });
+          };
+          document.addEventListener('DOMContentLoaded', function(){
+            var saved = 'en';
+            try{ saved = localStorage.getItem('preferred_language') || 'en'; }catch(_){ }
+            var sel = document.getElementById('langSelectPartial');
+            if (sel && [...sel.options].some(function(o){ return o.value === saved; })) sel.value = saved;
+            window.changeLanguage(saved);
+          });
+        }
+      }catch(err){ console.warn(err); }
+    })();
+  </script>
+  <section class="hero">
+    <div class="container">
+      <h1 class="display-5"><i class="fas fa-book-open"></i> About Farming</h1>
+      <p class="mb-0">A beginner‑friendly guide to crops, seasons, soil, irrigation, fertilizers, pest management and best practices.</p>
+    </div>
+  </section>
+
+  <div class="container my-4">
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="section-card h-100">
+          <h3 class="section-title"><i class="fas fa-seedling icon"></i> Crop Seasons in India</h3>
+          <p>India has three major agricultural seasons. Understanding these helps in choosing the right crop for the right time and region.</p>
+          <ul>
+            <li><span class="badge badge-soft">Kharif (June–October)</span> – Sown with monsoon onset; e.g., Rice, Maize, Cotton, Soybean, Groundnut.</li>
+            <li><span class="badge badge-soft">Rabi (October–March)</span> – Sown after monsoon; e.g., Wheat, Mustard, Gram, Barley, Pea.</li>
+            <li><span class="badge badge-soft">Zaid (March–June)</span> – Short summer season; e.g., Watermelon, Cucumber, Fodder crops.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="section-card h-100">
+          <h3 class="section-title"><i class="fas fa-mountain icon"></i> Soil Health Basics</h3>
+          <ul>
+            <li>Test soil every 2–3 years to know pH, organic carbon, N‑P‑K status.</li>
+            <li>Add <strong>organic matter</strong> (FYM/compost/green manure) to improve structure and water‑holding capacity.</li>
+            <li>Balance nutrients: apply fertilizers as per recommendation and split doses to avoid losses.</li>
+            <li>Maintain residue cover and reduce tillage to prevent erosion.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="section-card h-100">
+          <h3 class="section-title"><i class="fas fa-faucet-drip icon"></i> Irrigation & Water Management</h3>
+          <ul>
+            <li>Prefer <strong>micro‑irrigation</strong> (drip/sprinkler) for water savings and higher yields.</li>
+            <li>Irrigate in the early morning or evening to reduce evaporation.</li>
+            <li>Mulch to conserve soil moisture and suppress weeds.</li>
+            <li>Schedule irrigation based on soil moisture and crop stage, not the calendar.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="section-card h-100">
+          <h3 class="section-title"><i class="fas fa-flask icon"></i> Fertilizers & Nutrient Management</h3>
+          <ul>
+            <li>Follow the 4R principle: Right source, Right dose, Right time, Right method.</li>
+            <li>Combine chemical fertilizers with organics and bio‑fertilizers (Azotobacter, PSB).</li>
+            <li>Use seed treatment and micronutrients (Zn, B) where deficient.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="section-card h-100">
+          <h3 class="section-title"><i class="fas fa-bug icon"></i> Integrated Pest Management (IPM)</h3>
+          <ul>
+            <li>Choose resistant varieties and healthy certified seeds.</li>
+            <li>Monitor fields regularly; use traps/yellow sticky cards for early detection.</li>
+            <li>Prefer biological controls (Trichogramma, Neem‑based products); use chemicals only when thresholds are crossed.</li>
+            <li>Rotate pesticides with different modes of action to avoid resistance.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="section-card h-100">
+          <h3 class="section-title"><i class="fas fa-leaf icon"></i> Climate‑Smart & Sustainable Practices</h3>
+          <ul>
+            <li>Diversify with pulses, oilseeds, and horticulture for income stability.</li>
+            <li>Adopt conservation agriculture, intercropping, and agro‑forestry where suitable.</li>
+            <li>Harvest rainwater; use farm ponds and recharge pits.</li>
+            <li>Digitize records for costs, yields, and input use to make better decisions.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="section-card">
+          <h3 class="section-title"><i class="fas fa-hand-holding-heart icon"></i> Helpful Government Initiatives</h3>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="p-3 border rounded h-100">
+                <h6 class="mb-1">PM‑KISAN</h6>
+                <div class="text-muted small">Income support to eligible farmer families.</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 border rounded h-100">
+                <h6 class="mb-1">Soil Health Card</h6>
+                <div class="text-muted small">Soil testing, nutrient status and recommendations.</div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-3 border rounded h-100">
+                <h6 class="mb-1">PMFBY</h6>
+                <div class="text-muted small">Crop insurance against natural calamities.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="section-card">
+          <h3 class="section-title"><i class="fas fa-book icon"></i> Quick Reference: Examples of Major Crops</h3>
+          <div class="table-responsive">
+            <table class="table table-bordered table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>Season</th>
+                  <th>Examples</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Kharif</td><td>Rice, Maize, Cotton, Soybean, Groundnut, Bajra</td></tr>
+                <tr><td>Rabi</td><td>Wheat, Mustard, Gram, Barley, Linseed, Potato</td></tr>
+                <tr><td>Zaid</td><td>Watermelon, Muskmelon, Cucumber, Fodder, Vegetables</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="py-4 text-center text-muted small">
+    <div class="container">&copy; 2025 Agriculture Portal. This page is static and for educational guidance only.</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/template/translate.js"></script>
+</body>
+</html>
