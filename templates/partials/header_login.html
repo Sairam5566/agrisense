@@ -29,6 +29,26 @@
       right:16px;
       z-index:1000;
     }
+    .language-selector select{
+      background:rgba(255,255,255,0.95);
+      border:1px solid var(--border-light);
+      border-radius:8px;
+      padding:8px 12px;
+      font-size:0.9rem;
+      cursor:pointer;
+      transition:all 0.3s ease;
+      box-shadow:var(--shadow-sm);
+      max-width:200px;
+    }
+    .language-selector select:hover{
+      border-color:var(--primary-green);
+      box-shadow:var(--shadow-md);
+    }
+    .language-selector select:focus{
+      outline:none;
+      border-color:var(--primary-green);
+      box-shadow:0 0 0 3px rgba(45,143,71,0.1);
+    }
     .language-btn{
       background:rgba(255,255,255,0.9);
       border:1px solid var(--border-light);
@@ -56,11 +76,32 @@
       
       <!-- Language Selector -->
       <div class="language-selector">
-        <select id="languageSelect" class="form-select form-select-sm" onchange="changeLanguage(this.value)">
+        <select id="languageSelect" class="form-select form-select-sm" onchange="changeLanguage(this.value)" title="Select Language / भाषा चुनें">
           <option value="en">English</option>
-          <option value="hi">हिंदी</option>
-          <option value="nagpuri">नागपुरी</option>
-          <option value="santali">संताली</option>
+          <option value="hi">हिंदी (Hindi)</option>
+          <option value="as">অসমীয়া (Assamese)</option>
+          <option value="bn">বাংলা (Bengali)</option>
+          <option value="brx">बर' (Bodo)</option>
+          <option value="doi">डोगरी (Dogri)</option>
+          <option value="gu">ગુજરાતી (Gujarati)</option>
+          <option value="kn">ಕನ್ನಡ (Kannada)</option>
+          <option value="ks">कॉशुर (Kashmiri)</option>
+          <option value="gom">कोंकणी (Konkani)</option>
+          <option value="mai">मैथिली (Maithili)</option>
+          <option value="ml">മലയാളം (Malayalam)</option>
+          <option value="mni-Mtei">মেইতেই (Manipuri)</option>
+          <option value="mr">मराठी (Marathi)</option>
+          <option value="ne">नेपाली (Nepali)</option>
+          <option value="or">ଓଡ଼ିଆ (Odia)</option>
+          <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+          <option value="sa">संस्कृतम् (Sanskrit)</option>
+          <option value="sat">ᱥᱟᱱᱛᱟᱲᱤ (Santali)</option>
+          <option value="sd">سنڌي (Sindhi)</option>
+          <option value="ta">தமிழ் (Tamil)</option>
+          <option value="te">తెలుగు (Telugu)</option>
+          <option value="ur">اردو (Urdu)</option>
+          <!-- Legacy options for backward compatibility -->
+          <option value="nagpuri">नागपुरी (Nagpuri)</option>
         </select>
       </div>
     </div>
@@ -111,6 +152,70 @@
       hi: {
         site_title: "कृषि पोर्टल"
       },
+      as: {
+        site_title: "কৃষি পৰ্টেল"
+      },
+      bn: {
+        site_title: "কৃষি পোর্টাল"
+      },
+      brx: {
+        site_title: "खेती पोर्टल"
+      },
+      doi: {
+        site_title: "खेती पोर्टल"
+      },
+      gu: {
+        site_title: "કૃષિ પોર્ટલ"
+      },
+      kn: {
+        site_title: "ಕೃಷಿ ಪೋರ್ಟಲ್"
+      },
+      ks: {
+        site_title: "زراعت پورٹل"
+      },
+      gom: {
+        site_title: "शेतकी पोर्टल"
+      },
+      mai: {
+        site_title: "खेती पोर्टल"
+      },
+      ml: {
+        site_title: "കൃഷി പോർട്ടൽ"
+      },
+      "mni-Mtei": {
+        site_title: "লৌশিং পোর্তল"
+      },
+      mr: {
+        site_title: "कृषी पोर्टल"
+      },
+      ne: {
+        site_title: "कृषि पोर्टल"
+      },
+      or: {
+        site_title: "କୃଷି ପୋର୍ଟାଲ"
+      },
+      pa: {
+        site_title: "ਖੇਤੀ ਪੋਰਟਲ"
+      },
+      sa: {
+        site_title: "कृषि द्वारम्"
+      },
+      sat: {
+        site_title: "ᱦᱟᱞ ᱯᱚᱨᱴᱟᱞ"
+      },
+      sd: {
+        site_title: "زراعت پورٽل"
+      },
+      ta: {
+        site_title: "விவசாய போர்ட்டல்"
+      },
+      te: {
+        site_title: "వ్యవసాయ పోర్టల్"
+      },
+      ur: {
+        site_title: "زراعت پورٹل"
+      },
+      // Legacy translations
       nagpuri: {
         site_title: "खेती पोर्टल"
       },
@@ -120,12 +225,38 @@
     };
     
     window.changeLanguage = function(lang){
-      try{ localStorage.setItem('preferred_language', lang); }catch(_){ }
+      try{ 
+        localStorage.setItem('preferred_language', lang); 
+        console.log('Language changed to:', lang);
+      }catch(e){ 
+        console.warn('Failed to save language preference:', e);
+      }
+      
       var dict = headerTranslations[lang] || headerTranslations.en;
       document.querySelectorAll('[data-translate]').forEach(function(el){
         var key = el.getAttribute('data-translate');
-        if (key && dict[key]) { el.textContent = dict[key]; }
+        if (key && dict[key]) { 
+          el.textContent = dict[key]; 
+        }
       });
+      
+      // Update page direction for RTL languages
+      if (['ur', 'sd', 'ks'].includes(lang)) {
+        document.documentElement.setAttribute('dir', 'rtl');
+        document.documentElement.setAttribute('lang', lang);
+      } else {
+        document.documentElement.setAttribute('dir', 'ltr');
+        document.documentElement.setAttribute('lang', lang);
+      }
+      
+      // Trigger custom event for other parts of the app
+      try {
+        window.dispatchEvent(new CustomEvent('languageChanged', { 
+          detail: { language: lang, translations: dict } 
+        }));
+      } catch(e) {
+        console.warn('Failed to dispatch language change event:', e);
+      }
     };
   </script>
 </body>
