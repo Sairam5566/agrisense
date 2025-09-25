@@ -15,8 +15,7 @@ scikit-learn>=1.4.0
 speechrecognition>=3.10.0
 pyttsx3>=2.90
 googletrans-py>=4.0.0rc1
-google-generativeai==0.3.2
-
-# Image processing for soil analysis
-Pillow==10.3.0
+google-generativeai>=0.3.0
+Pillow>=10.4.0
 Pillow-Heif>=0.16.0
+beautifulsoup4  # Use this instead of bs4
