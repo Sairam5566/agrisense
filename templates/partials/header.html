@@ -49,8 +49,7 @@
           </select>
         </li>
         <li class="nav-item"><a class="nav-link" href="/home"><i class="fas fa-home"></i> <span data-translate="home">Home</span></a></li>
-        <li class="nav-item"><a class="nav-link" href="/weather"><i class="fas fa-cloud-sun"></i> <span data-translate="weather">Weather</span></a></li>
-        <li class="nav-item d-none" id="navFarmer"><a class="nav-link" href="/farmer"><i class="fas fa-tractor"></i> <span data-translate="farmer_portal">Farmer Portal</span></a></li>
+        <li class="nav-item" id="navFarmer"><a class="nav-link" href="/farmer"><i class="fas fa-tractor"></i> <span data-translate="farmer_portal">Farmer Portal</span></a></li>
         <li class="nav-item d-none" id="navBuyer"><a class="nav-link" href="/buyer"><i class="fas fa-store"></i> <span data-translate="buyer_portal">Buyer Portal</span></a></li>
         <li class="nav-item"><a class="nav-link" href="/contact"><i class="fas fa-envelope"></i> <span data-translate="contact">Contact</span></a></li>
         <li class="nav-item d-none" id="navLogout"><a class="nav-link" href="#" onclick="appLogout()"><i class="fas fa-right-from-bracket"></i> <span data-translate="logout">Logout</span></a></li>
@@ -74,19 +73,9 @@
       });
     }catch(err){ console.warn(err); }
   })();
-  // Toggle header items by login state
-  (function(){
-    var ut = localStorage.getItem('user_type');
-    var token = localStorage.getItem('token');
-    var farmer = document.getElementById('navFarmer');
-    var buyer = document.getElementById('navBuyer');
-    var logout = document.getElementById('navLogout');
-    if(token){
-      if(ut === 'farmer' && farmer) farmer.classList.remove('d-none');
-      if(ut === 'customer' && buyer) buyer.classList.remove('d-none');
-      if(logout) logout.classList.remove('d-none');
-    }
-  })();
+  // Authentication handled by base.html - no duplicate system needed here
+  
+  // Manual testing function now in base.html
   function appLogout(){ localStorage.removeItem('token'); localStorage.removeItem('user_type'); localStorage.removeItem('user_id'); window.location.href='/'; }
   // Smart navigation: from base -> section keeps base in history; section -> section replaces history
   (function(){

@@ -953,12 +953,40 @@
 
         // Auth-aware navbar items and logout
         function syncNavFromAuth(){
-            const token = localStorage.getItem('token');
-            const role = localStorage.getItem('user_type');
-            const show = (id, cond) => { const el = document.getElementById(id); if(el){ el.classList.toggle('d-none', !cond); } };
-            show('navFarmer', !!token && role === 'farmer');
-            show('navBuyer', !!token && role === 'customer');
-            show('navLogout', !!token);
+            try {
+                const token = localStorage.getItem('token');
+                const roleRaw = localStorage.getItem('user_type');
+                const role = (roleRaw || '').toLowerCase();
+                console.log('Syncing auth navigation - Token:', token, 'Role:', role);
+                
+                const show = (id, cond) => { 
+                    const el = document.getElementById(id); 
+                    if(el){ 
+                        if (cond) {
+                            el.classList.remove('d-none');
+                            console.log('Showing element:', id);
+                        } else {
+                            el.classList.add('d-none');
+                            console.log('Hiding element:', id);
+                        }
+                    } else {
+                        console.log('Element not found:', id);
+                    }
+                };
+                
+                // Keep Farmer Portal always visible; only toggle Buyer and Logout
+                const isBuyer = !!token && (role === 'customer' || role === 'buyer');
+                const isLoggedIn = !!token;
+                
+                // Do NOT hide Farmer portal from header even if logged out
+                const farmerEl = document.getElementById('navFarmer');
+                if (farmerEl) farmerEl.classList.remove('d-none');
+                
+                show('navBuyer', isBuyer);
+                show('navLogout', isLoggedIn);
+            } catch (error) {
+                console.error('Error in syncNavFromAuth:', error);
+            }
         }
         function appLogout(){
             localStorage.removeItem('token');
@@ -969,6 +997,12 @@
         }
         window.appLogout = appLogout;
         document.addEventListener('DOMContentLoaded', syncNavFromAuth);
+        
+        // Expose function for manual testing
+        window.checkAuthNavigation = function() {
+            console.log('Manually checking auth navigation...');
+            syncNavFromAuth();
+        };
 
         // Feature functions
         function showMLFeatures() {
