@@ -974,15 +974,22 @@
                     }
                 };
                 
-                // Keep Farmer Portal always visible; only toggle Buyer and Logout
+                // Role-based navigation visibility
                 const isBuyer = !!token && (role === 'customer' || role === 'buyer');
+                const isFarmer = !!token && (role === 'farmer');
                 const isLoggedIn = !!token;
                 
-                // Do NOT hide Farmer portal from header even if logged out
-                const farmerEl = document.getElementById('navFarmer');
-                if (farmerEl) farmerEl.classList.remove('d-none');
+                // Show portals based on user role
+                if (isLoggedIn) {
+                    // If logged in, show only the appropriate portal
+                    show('navFarmer', isFarmer);
+                    show('navBuyer', isBuyer);
+                } else {
+                    // If not logged in, show both portals (default behavior)
+                    show('navFarmer', true);
+                    show('navBuyer', false); // Buyer portal hidden by default
+                }
                 
-                show('navBuyer', isBuyer);
                 show('navLogout', isLoggedIn);
             } catch (error) {
                 console.error('Error in syncNavFromAuth:', error);

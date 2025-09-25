@@ -111,3 +111,19 @@ class BuyerRequirement(Base):
     contact_email = Column(String(120), nullable=True)
     requirement = Column(Text, nullable=False)
     created_at = Column(DateTime, server_default=func.now())
+    is_satisfied = Column(Boolean, default=False)
+    satisfied_by_farmer_id = Column(Integer, nullable=True)
+
+
+class FarmerProposal(Base):
+    __tablename__ = "farmer_proposals"
+
+    id = Column(Integer, primary_key=True, index=True)
+    farmer_id = Column(Integer, nullable=False)
+    buyer_requirement_id = Column(Integer, nullable=False)
+    proposed_quantity = Column(Float, nullable=False)
+    proposed_price_per_unit = Column(Float, nullable=False)
+    unit = Column(String(20), nullable=False, default="kg")
+    status = Column(String(20), nullable=False, default="pending")  # pending, accepted, rejected
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
