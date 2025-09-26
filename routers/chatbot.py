@@ -46,8 +46,8 @@ async def chat(chat_message: ChatMessage):
         If asked about non-agricultural topics, politely redirect to farming-related assistance.
         Provide concise, actionable advice in 2-3 sentences."""
         
-        # Try different model names with fallback
-        model_names = ['gemini-1.5-flash', 'gemini-pro']
+        # Try different model names with fallback (corrected model names)
+        model_names = ["gemini-2.5-flash"]
         ai_response = None
         
         for model_name in model_names:
