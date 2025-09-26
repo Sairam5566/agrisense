@@ -5,16 +5,27 @@ Speech-to-Text and Text-to-Speech functionality for farmers
 from fastapi import APIRouter, Form, HTTPException, UploadFile, File
 from fastapi.responses import JSONResponse
 import speech_recognition as sr
-import pyttsx3
 import io
 import wave
+import os
 from googletrans import Translator
 
 router = APIRouter()
 
 # Initialize speech recognition and text-to-speech
 recognizer = sr.Recognizer()
-tts_engine = pyttsx3.init()
+
+# Initialize TTS only if not in production environment
+tts_engine = None
+try:
+    # Only initialize pyttsx3 if we're not in a server environment
+    if os.getenv("RENDER") != "true" and os.getenv("RAILWAY_ENVIRONMENT") != "production":
+        import pyttsx3
+        tts_engine = pyttsx3.init()
+except (ImportError, RuntimeError) as e:
+    print(f"TTS not available in this environment: {e}")
+    tts_engine = None
+
 translator = Translator()
 
 # Language codes for agriculture portal
@@ -101,11 +112,14 @@ async def text_to_speech(
         else:
             speech_text = text
         
-        # Configure TTS engine
-        tts_engine.setProperty('rate', speed)
-        
-        # For zero-cost implementation, we'll return the text that would be spoken
-        # In a full implementation, you would generate actual audio file
+        # Configure TTS engine if available
+        if tts_engine:
+            tts_engine.setProperty('rate', speed)
+            # For zero-cost implementation, we'll return the text that would be spoken
+            # In a full implementation, you would generate actual audio file
+            note = "Audio generation requires additional setup. Text is ready for local TTS."
+        else:
+            note = "TTS engine not available in production environment. Text prepared for client-side synthesis."
         
         return {
             "success": True,
@@ -113,7 +127,7 @@ async def text_to_speech(
             "language": language,
             "speed": speed,
             "message": "Text prepared for speech synthesis",
-            "note": "Audio generation requires additional setup. Text is ready for local TTS."
+            "note": note
         }
         
     except Exception as e:

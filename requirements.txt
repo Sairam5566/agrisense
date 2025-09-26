@@ -13,9 +13,8 @@ pandas>=2.2.0
 numpy>=2.0.0
 scikit-learn>=1.4.0
 speechrecognition>=3.10.0
-pyttsx3>=2.90
 googletrans-py>=4.0.0rc1
 google-generativeai>=0.3.0
 Pillow>=10.4.0
 Pillow-Heif>=0.16.0
-beautifulsoup4  # Use this instead of bs4
+beautifulsoup4
