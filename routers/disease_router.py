@@ -31,7 +31,7 @@ async def disease_status():
     """Quick status check for Gemini configuration."""
     return {
         "gemini_configured": bool(GEMINI_API_KEY),
-        "model_type": "Gemini-1.5-Flash (Image Analysis)"
+        "model_type": "Gemini-2.5-Flash (Image Analysis)"
     }
 
 @router.get("/diseases")
@@ -101,7 +101,7 @@ async def predict(image: UploadFile = File(...)):
         if GEMINI_API_KEY:
             try:
                 genai.configure(api_key=GEMINI_API_KEY)
-                model = genai.GenerativeModel('gemini-1.5-flash')
+                model = genai.GenerativeModel('gemini-2.5-flash')
                 prompt = '''Look at this plant photo. Tell me what plant it is (like rice, tomato, potato). Check if the plant has any disease or pest problems. If the plant looks healthy with no disease signs, say "Healthy Plant". If you see disease signs, name the disease. Give confidence as just a number 0-100 (like "85" not "85%").
 
                 FOR HEALTHY PLANTS (use this format exactly):
